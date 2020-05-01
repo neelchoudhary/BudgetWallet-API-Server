@@ -32,8 +32,9 @@ func (r *FinancialItemRepository) AddItem(item *models.FinancialItem) error {
 
 // UpdateItem update the given itemID's item with the new item in the DB... TODO
 func (r *FinancialItemRepository) UpdateItem(userID int64, itemID int64, item *models.FinancialItem) error {
-	_, err := r.db.Exec("UPDATE items SET CURRENT_BALANCE=$3, AVAILABLE_BALANCE=$4 WHERE item_id=$1 AND plaid_account_id=$2",
-		itemID)
+	_, err := r.db.Exec("UPDATE items SET PLAID_ITEM_ID=$3, PLAID_ACCESS_TOKEN=$4, PLAID_INSTITUTION_ID=$5, INSTITUTION_NAME=$6, INSTITUTION_COLOR=$7, INSTITUTION_LOGO=$8, ERROR_CODE=$9, ERROR_DEV_MSG=$10, ERROR_USER_MSG=$11 WHERE id=$1 AND user_id=$2",
+		itemID, userID, item.PlaidItemID, item.PlaidAccessToken, item.PlaidInstitutionID, item.InstitutionName,
+		item.InstitutionColor, item.InstitutionLogo, item.ErrorCode, item.ErrorDevMessage, item.ErrorUserMessage)
 	return err
 }
 
