@@ -3,7 +3,7 @@ package postgresql
 import (
 	"database/sql"
 
-	"github.com/neelchoudhary/budgetmanagergrpc/models"
+	"github.com/neelchoudhary/budgetwallet-api-server/models"
 )
 
 type userRepository struct {

@@ -1,9 +1,9 @@
 package postgresql
 
 import (
-	"github.com/neelchoudhary/budgetmanagergrpc/models"
-
 	"database/sql"
+
+	"github.com/neelchoudhary/budgetwallet-api-server/models"
 )
 
 // FinancialItemRepository struct
@@ -32,10 +32,9 @@ func (r *FinancialItemRepository) AddItem(item *models.FinancialItem) error {
 
 // UpdateItem update the given itemID's item with the new item in the DB... TODO
 func (r *FinancialItemRepository) UpdateItem(userID int64, itemID int64, item *models.FinancialItem) error {
-	// _, err := r.db.Exec("UPDATE items SET CURRENT_BALANCE=$3, AVAILABLE_BALANCE=$4 WHERE item_id=$1 AND plaid_account_id=$2",
-	// 	itemID, plaidAccounts[i].AccountID, plaidAccounts[i].Balances.Current)
-	// return err
-	return nil
+	_, err := r.db.Exec("UPDATE items SET CURRENT_BALANCE=$3, AVAILABLE_BALANCE=$4 WHERE item_id=$1 AND plaid_account_id=$2",
+		itemID)
+	return err
 }
 
 // GetItemByID get item by itemID and userID from the DB

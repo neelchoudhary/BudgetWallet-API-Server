@@ -1,9 +1,9 @@
 package postgresql
 
 import (
-	"github.com/neelchoudhary/budgetmanagergrpc/models"
-
 	"database/sql"
+
+	"github.com/neelchoudhary/budgetwallet-api-server/models"
 )
 
 // FinancialAccountRepository struct

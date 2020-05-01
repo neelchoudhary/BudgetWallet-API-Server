@@ -5,8 +5,8 @@ import (
 
 	"github.com/plaid/plaid-go/plaid"
 
-	"github.com/neelchoudhary/budgetmanagergrpc/models"
-	shared "github.com/neelchoudhary/budgetmanagergrpc/services/shared"
+	"github.com/neelchoudhary/budgetwallet-api-server/models"
+	"github.com/neelchoudhary/budgetwallet-api-server/services/shared"
 )
 
 // Service PlaidFinancesService struct

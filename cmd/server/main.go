@@ -3,15 +3,12 @@ package main
 import (
 	"flag"
 
-	"github.com/neelchoudhary/budgetmanagergrpc/services/plaidfinances"
-	"github.com/neelchoudhary/budgetmanagergrpc/services/userfinances"
-
-	"github.com/neelchoudhary/budgetmanagergrpc/config"
-
-	"github.com/neelchoudhary/budgetmanagergrpc/postgresql"
-	"github.com/neelchoudhary/budgetmanagergrpc/services/auth"
-
-	"github.com/neelchoudhary/budgetmanagergrpc/utils"
+	"github.com/neelchoudhary/budgetwallet-api-server/config"
+	"github.com/neelchoudhary/budgetwallet-api-server/postgresql"
+	"github.com/neelchoudhary/budgetwallet-api-server/services/auth"
+	"github.com/neelchoudhary/budgetwallet-api-server/services/plaidfinances"
+	"github.com/neelchoudhary/budgetwallet-api-server/services/userfinances"
+	"github.com/neelchoudhary/budgetwallet-api-server/utils"
 )
 
 func main() {

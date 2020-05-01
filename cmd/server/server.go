@@ -6,13 +6,12 @@ import (
 	"net"
 	"net/http"
 
-	"github.com/neelchoudhary/budgetmanagergrpc/services/plaidfinances"
-	"github.com/neelchoudhary/budgetmanagergrpc/services/userfinances"
-
 	"github.com/gorilla/mux"
-	"github.com/neelchoudhary/budgetmanagergrpc/config"
-	"github.com/neelchoudhary/budgetmanagergrpc/services/auth"
-	"github.com/neelchoudhary/budgetmanagergrpc/utils"
+	"github.com/neelchoudhary/budgetwallet-api-server/config"
+	"github.com/neelchoudhary/budgetwallet-api-server/services/auth"
+	"github.com/neelchoudhary/budgetwallet-api-server/services/plaidfinances"
+	"github.com/neelchoudhary/budgetwallet-api-server/services/userfinances"
+	"github.com/neelchoudhary/budgetwallet-api-server/utils"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 )

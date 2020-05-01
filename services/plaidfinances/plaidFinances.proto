@@ -1,7 +1,7 @@
 syntax = "proto3";
 
 package plaidfinances;
-option go_package="github.com/neelchoudhary/budgetmanagergrpc/services/plaidfinances";
+option go_package="github.com/neelchoudhary/budgetwallet-api-server/services/plaidfinances";
 
 import "services/shared/shared.proto";
 

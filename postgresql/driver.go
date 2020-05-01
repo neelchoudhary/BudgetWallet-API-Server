@@ -4,13 +4,13 @@ import (
 	"database/sql"
 	"fmt"
 
-	"github.com/neelchoudhary/budgetmanagergrpc/config"
+	"github.com/golang-migrate/migrate"
+	"github.com/neelchoudhary/budgetwallet-api-server/config"
+	"github.com/neelchoudhary/budgetwallet-api-server/utils"
 
-	"github.com/neelchoudhary/budgetmanagergrpc/utils"
-	"github.com/golang-migrate/migrate/v4"
 	// Required imports
-	_ "github.com/golang-migrate/migrate/v4/database/postgres"
-	_ "github.com/golang-migrate/migrate/v4/source/file"
+	_ "github.com/golang-migrate/migrate/database/postgres"
+	_ "github.com/golang-migrate/migrate/source/file"
 )
 
 // ConnectDB connect to postgresql db

@@ -1,7 +1,7 @@
 syntax = "proto3";
 
 package shared;
-option go_package="github.com/neelchoudhary/budgetmanagergrpc/services/shared";
+option go_package="github.com/neelchoudhary/budgetwallet-api-server/services/shared";
 
 message FinancialAccount {
     int64 id = 1;

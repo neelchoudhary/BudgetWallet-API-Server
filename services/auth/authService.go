@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/neelchoudhary/budgetmanagergrpc/models"
-	"github.com/neelchoudhary/budgetmanagergrpc/utils"
+	"github.com/neelchoudhary/budgetwallet-api-server/models"
+	"github.com/neelchoudhary/budgetwallet-api-server/utils"
 	"golang.org/x/crypto/bcrypt"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"

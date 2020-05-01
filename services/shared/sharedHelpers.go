@@ -1,6 +1,6 @@
 package shared
 
-import "github.com/neelchoudhary/budgetmanagergrpc/models"
+import "github.com/neelchoudhary/budgetwallet-api-server/models"
 
 // DataToAccountPb convert models Financial Account to pb Financial Account
 func DataToAccountPb(data models.FinancialAccount) *FinancialAccount {

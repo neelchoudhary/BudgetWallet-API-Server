@@ -1,7 +1,7 @@
 syntax = "proto3";
 
 package auth;
-option go_package="github.com/neelchoudhary/budgetmanagergrpc/services/auth";
+option go_package="github.com/neelchoudhary/budgetwallet-api-server/services/auth";
 
 message User {
     int64 id = 1;

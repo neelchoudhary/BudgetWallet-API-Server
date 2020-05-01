@@ -4,8 +4,8 @@ import (
 	context "context"
 	fmt "fmt"
 
-	"github.com/neelchoudhary/budgetmanagergrpc/models"
-	shared "github.com/neelchoudhary/budgetmanagergrpc/services/shared"
+	"github.com/neelchoudhary/budgetwallet-api-server/models"
+	shared "github.com/neelchoudhary/budgetwallet-api-server/services/shared"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
 )

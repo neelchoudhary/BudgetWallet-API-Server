@@ -3,7 +3,7 @@ package models
 import (
 	"fmt"
 
-	"github.com/neelchoudhary/budgetmanagergrpc/utils"
+	"github.com/neelchoudhary/budgetwallet-api-server/utils"
 	"golang.org/x/crypto/bcrypt"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"

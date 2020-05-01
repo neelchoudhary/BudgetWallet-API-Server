@@ -3,7 +3,7 @@ package config
 import (
 	"net/http"
 
-	"github.com/neelchoudhary/budgetmanagergrpc/utils"
+	"github.com/neelchoudhary/budgetwallet-api-server/utils"
 	"github.com/plaid/plaid-go/plaid"
 )
 
