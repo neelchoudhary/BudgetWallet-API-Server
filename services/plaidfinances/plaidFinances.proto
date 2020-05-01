@@ -1,0 +1,80 @@
+syntax = "proto3";
+
+package plaidfinances;
+option go_package="github.com/neelchoudhary/budgetmanagergrpc/services/plaidfinances";
+
+import "services/shared/shared.proto";
+
+message Category {
+    int64 id = 1;
+    string name = 2;
+    string group = 3;
+}
+
+message LinkFinancialInstitutionRequest {
+    int64 user_id = 1;
+    string public_token = 2;
+    string plaid_institution_id = 3;
+}
+
+message LinkFinancialInstitutionResponse {
+    repeated shared.FinancialAccount financial_accounts = 1;
+} 
+
+message UpdateFinancialInstitutionRequest {
+    int64 user_id = 1;
+    int64 item_id = 2;
+}
+
+message UpdateFinancialInstitutionResponse {
+    bool success = 1;
+}
+
+message UpdateFinancialAccountsRequest {
+    int64 user_id = 1;
+    int64 item_id = 2;
+}
+
+message UpdateFinancialAccountsResponse {
+    bool success = 1;
+}
+
+message RemoveFinancialInstitutionRequest {
+    int64 user_id = 1;
+    int64 item_id = 2;
+}
+
+message RemoveFinancialInstitutionResponse {
+    bool success = 1;
+}
+
+message AddTransactionsRequest {
+    int64 user_id = 1;
+    int64 item_id = 2;
+}
+
+message AddTransactionsResponse {
+    bool success = 1;
+}
+
+message Empty {
+
+}
+
+message AddPlaidCategoriesResponse {
+    bool success = 1;
+}
+
+message RemovePlaidCategoriesResponse {
+    bool success = 1;
+}
+
+service PlaidFinancesService {
+    rpc LinkFinancialInstitution(LinkFinancialInstitutionRequest) returns (LinkFinancialInstitutionResponse) {};
+    rpc UpdateFinancialInstitution(UpdateFinancialInstitutionRequest) returns (UpdateFinancialInstitutionResponse) {};
+    rpc UpdateFinancialAccounts(UpdateFinancialAccountsRequest) returns (UpdateFinancialAccountsResponse) {};
+    rpc RemoveFinancialInstitution(RemoveFinancialInstitutionRequest) returns (RemoveFinancialInstitutionResponse) {};
+    rpc AddTransactions(AddTransactionsRequest) returns (AddTransactionsResponse) {};
+    rpc AddPlaidCategories(Empty) returns (AddPlaidCategoriesResponse) {};
+    rpc RemovePlaidCategories(Empty) returns (RemovePlaidCategoriesResponse) {};
+}
