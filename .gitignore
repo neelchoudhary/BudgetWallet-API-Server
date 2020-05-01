@@ -16,4 +16,8 @@
 
 /cmd/out
 /cmd/scripts
+/cmd/client/accessToken
+/cmd/client
 /ssl
+**/.DS_Store
+
