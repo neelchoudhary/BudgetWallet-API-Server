@@ -16,12 +16,21 @@ run-server: ## run the grpc server locally
 	./cmd/scripts/run-server-local.sh
 
 .PHONY: run-auth-client 
-run-auth-client: ## run a local instance of the auth client
-	go run cmd/client/*.go -serverEnv $(ENV) -clientName auth -serverTLSPath ssl/ca.crt
+run-auth-client: ## connect to the local auth client
+	go run cmd/client/*.go -serverEnv local -clientName auth -serverTLSPath ssl/ca.crt -serverAddress localhost:50051
 
 .PHONY: run-app-client 
-run-app-client: ## run a local instance of the app client
-	go run cmd/client/*.go -serverEnv $(ENV) -clientName app -serverTLSPath ssl/ca.crt
+run-app-client: ## connect to the local app client
+	go run cmd/client/*.go -serverEnv local -clientName app -serverTLSPath ssl/ca.crt -serverAddress localhost:50051
+
+.PHONY: prd-run-auth-client-prd 
+run-auth-client-prd: ## connect to the prd auth client
+	go run cmd/client/*.go -serverEnv prd -clientName auth -serverTLSPath ssl/ca.crt -serverAddress neelchoudhary.com:1443
+
+.PHONY: prd-run-app-client-prd 
+run-app-client-prd: ## connect to the prd app client
+	go run cmd/client/*.go -serverEnv prd -clientName app -serverTLSPath ssl/ca.crt -serverAddress neelchoudhary.com:1443
+
 
 .PHONY: migrate
 migrate: ## run all new database migrations

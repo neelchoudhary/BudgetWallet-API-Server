@@ -33,9 +33,6 @@ func ConnectDB(dbConfig *config.DBConfig) *sql.DB {
 
 // MigrateUp migrate up to most recent migration
 // Used for development and continuous integration
-// migrate create -ext sql -dir db/migrations -seq create_users_table
-// migrate -database postgres://postgres:password@localhost:5432/postgres?sslmode=disable -path db/migrations up
-// migrate -database postgres://postgres:password@localhost:5432/postgres?sslmode=disable -path db/migrations down
 func MigrateUp(dbConfig *config.DBConfig) {
 	fmt.Println("Migrating Up...")
 	sourceURL := "file://postgresql/migrations"
