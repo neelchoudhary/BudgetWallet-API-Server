@@ -123,6 +123,7 @@ func dataToTransactionPb(data models.FinancialTransaction) *shared.FinancialTran
 		ItemId:             data.ItemID,
 		AccountId:          data.AccountID,
 		CategoryId:         data.CategoryID,
+		PlaidAccountId:     data.PlaidAccountID,
 		PlaidCategoryId:    data.PlaidCategoryID,
 		PlaidTransactionId: data.PlaidTransactionID,
 		Name:               data.Name,

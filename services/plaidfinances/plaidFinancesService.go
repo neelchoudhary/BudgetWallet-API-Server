@@ -2,6 +2,9 @@ package plaidfinances
 
 import (
 	context "context"
+	fmt "fmt"
+	"strconv"
+	"time"
 
 	"github.com/plaid/plaid-go/plaid"
 
@@ -82,7 +85,7 @@ func (s *Service) UpdateFinancialAccounts(ctx context.Context, req *UpdateFinanc
 	if err != nil {
 		return nil, err
 	}
-	plaidResponse, err := s.plaidClient.GetBalances(item.GetAccessToken())
+	plaidResponse, err := s.plaidClient.GetBalances(item.PlaidAccessToken)
 	if err != nil {
 		return nil, err
 	}
@@ -128,9 +131,81 @@ func (s *Service) RemoveFinancialInstitution(ctx context.Context, req *RemoveFin
 	return res, nil
 }
 
-// AddTransactions add transactions to the DB from plaid for a user's item
-func (s *Service) AddTransactions(ctx context.Context, req *AddTransactionsRequest) (*AddTransactionsResponse, error) {
-	return nil, nil
+// AddHistoricalFinancialTransactions add all transactions since 2015 to the DB from plaid for a user's item
+func (s *Service) AddHistoricalFinancialTransactions(ctx context.Context, req *AddHistoricalFinancialTransactionsRequest) (*AddHistoricalFinancialTransactionsResponse, error) {
+	s.financialTransactionRepo.RemoveItemTransactions(req.GetUserId(), req.GetItemId())
+
+	item, err := s.financialItemRepo.GetItemByID(req.GetUserId(), req.GetItemId())
+	if err != nil {
+		return nil, err
+	}
+
+	allTransactions, err := item.GetFinancialTransactionsFromPlaid("2015-01-01", s.plaidClient)
+	for _, transaction := range allTransactions {
+		account, err := s.financialAccountRepo.GetAccountByPlaidID(req.GetUserId(), transaction.PlaidAccountID)
+		if err != nil {
+			return nil, err
+		}
+		transaction.AccountID = account.ID
+		transaction.CategoryID = 1
+
+		s.financialTransactionRepo.AddTransaction(&transaction)
+	}
+
+	if len(allTransactions) != 0 {
+		// todo log bad
+		fmt.Println("WARNING: Historical transactions count mismatch. Expected: " +
+			strconv.FormatInt(req.GetExpectedCount(), 10) + ". Got: " +
+			strconv.Itoa(len(allTransactions)))
+	}
+
+	res := &AddHistoricalFinancialTransactionsResponse{
+		Success: true,
+	}
+
+	return res, nil
+}
+
+// AddFinancialTransactions add new transactions from the last 10 days to the DB from plaid for a user's item
+func (s *Service) AddFinancialTransactions(ctx context.Context, req *AddFinancialTransactionsRequest) (*AddFinancialTransactionsResponse, error) {
+	item, err := s.financialItemRepo.GetItemByID(req.GetUserId(), req.GetItemId())
+	if err != nil {
+		return nil, err
+	}
+
+	startDate := time.Now().Local().Add(time.Duration(240) * time.Hour * -1).Format("2006-01-02") // 10 days back
+	allTransactions, err := item.GetFinancialTransactionsFromPlaid(startDate, s.plaidClient)
+	filteredTransactions := models.FilterTransactions(allTransactions, func(t models.FinancialTransaction) bool {
+		exists, err := s.financialTransactionRepo.DoesTransactionExist(req.GetUserId(), t.PlaidTransactionID)
+		if err != nil {
+			return false
+		}
+		return !exists
+	})
+	for _, transaction := range filteredTransactions {
+		account, err := s.financialAccountRepo.GetAccountByPlaidID(req.GetUserId(), transaction.PlaidAccountID)
+		if err != nil {
+			return nil, err
+		}
+		transaction.AccountID = account.ID
+		transaction.CategoryID = 2
+
+		s.financialTransactionRepo.AddTransaction(&transaction)
+	}
+
+	// != given transaction count (from req)
+	if int64(len(filteredTransactions)) != req.GetExpectedCount() {
+		// todo log bad
+		fmt.Println("WARNING: Transactions count mismatch. Expected: " +
+			strconv.FormatInt(req.GetExpectedCount(), 10) + ". Got: " +
+			strconv.Itoa(len(filteredTransactions)))
+	}
+
+	res := &AddFinancialTransactionsResponse{
+		Success: true,
+	}
+
+	return res, nil
 }
 
 // AddPlaidCategories add all plaid categories to the DB
@@ -142,64 +217,6 @@ func (s *Service) AddPlaidCategories(context.Context, *Empty) (*AddPlaidCategori
 func (s *Service) RemovePlaidCategories(context.Context, *Empty) (*RemovePlaidCategoriesResponse, error) {
 	return nil, nil
 }
-
-// Min Returns the min of two ints
-func Min(x, y int) int {
-	if x > y {
-		return y
-	}
-	return x
-}
-
-// func (s *Service) addTransactionsHelper(userID int64, itemID int64, accessToken string, offset int, count int) (int, error) {
-// 	// Get transactions from Plaid (500 max at a time) with offset pagination
-// 	res, err := s.plaidClient.GetTransactionsWithOptions(accessToken, plaid.GetTransactionsOptions{
-// 		EndDate:   time.Now().Local().Format("2006-01-02"),
-// 		StartDate: "2015-01-01",
-// 		Count:     Min(count, 500),
-// 		Offset:    offset,
-// 	})
-// 	if err != nil {
-// 		return 0, err
-// 	}
-
-// 	uniqueTransactionsAdded := 0
-
-// 	// Write new transactions to db
-// 	for _, plaidTransaction := range res.Transactions {
-// 		// Convert PlaidAccountID to AccountID
-// 		account, err := s.financialAccountRepo.GetAccountByPlaidID(userID, plaidTransaction.AccountID)
-// 		if err != nil {
-// 			return 0, err
-// 		}
-
-// 		// Convert PlaidCategoryID to CategoryID
-// 		categoryID, err := GetCategoryID(plaidTransaction.CategoryID)
-// 		if err != nil {
-// 			return 0, err
-// 		}
-
-// 		// Create new transaction to add to db
-// 		transaction := models.NewFinancialTransactionFromPlaid(userID, itemID, account.GetAccountID(), categoryID, plaidTransaction)
-
-// 		var exists bool
-// 		row := db.QueryRow("SELECT EXISTS(SELECT 1 FROM transactions2 WHERE plaid_transaction_id=$1);", transactions[i].ID)
-// 		if err := row.Scan(&exists); err != nil {
-// 			return 0, err
-// 		} else if !exists {
-// 			err := s.financialTransactionRepo.AddTransaction(transaction)
-// 			if err != nil {
-// 				return 0, err
-// 			}
-// 		}
-// 	}
-
-// 	if len(res.Transactions) < 500 {
-// 		return 0, nil
-// 	}
-
-// 	return count - uniqueTransactionsAdded, nil
-// }
 
 // // RemoveTransactions Get transactions from Plaid given the pagination offset to be added to the db
 // func RemoveTransactions(w http.ResponseWriter, r *http.Request, userID int64, itemID int64, plaidTransactionIDs []string) {

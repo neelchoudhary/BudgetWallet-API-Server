@@ -18,9 +18,10 @@ func NewFinancialTransactionRepository(db *sql.DB) models.FinancialTransactionRe
 // AddTransaction add given transaction to the DB
 func (r *financialTransactionRepository) AddTransaction(transaction *models.FinancialTransaction) error {
 	var transactionID int64
-	err := r.db.QueryRow("INSERT INTO transactions (USER_ID, ITEM_ID, ACCOUNT_ID, CATEGORY_ID, PLAID_CATEGORY_ID, PLAID_TRANSACTION_ID, NAME, AMOUNT, DATE, PENDING) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING id;",
+	err := r.db.QueryRow("INSERT INTO transactions (USER_ID, ITEM_ID, ACCOUNT_ID, CATEGORY_ID, PLAID_CATEGORY_ID, PLAID_TRANSACTION_ID, NAME, AMOUNT, DATE, PENDING, PLAID_ACCOUNT_ID) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING id;",
 		transaction.UserID, transaction.ItemID, transaction.AccountID, transaction.CategoryID, transaction.PlaidCategoryID,
-		transaction.PlaidTransactionID, transaction.Name, transaction.Amount, transaction.Date, transaction.Pending).Scan(&transactionID)
+		transaction.PlaidTransactionID, transaction.Name, transaction.Amount, transaction.Date, transaction.Pending,
+		transaction.PlaidAccountID).Scan(&transactionID)
 	if err != nil {
 		return err
 	}
@@ -35,14 +36,21 @@ func (r *financialTransactionRepository) UpdateTransaction(userID int64, transac
 	return err
 }
 
+// DoesTransactionExist get transaction by userID and transactionID from the DB
+func (r *financialTransactionRepository) DoesTransactionExist(userID int64, plaidTransactionID string) (bool, error) {
+	var exists bool
+	err := r.db.QueryRow("SELECT EXISTS(SELECT 1 FROM transactions WHERE user_id=$1 AND plaid_transaction_id=$2);", userID, plaidTransactionID).Scan(&exists)
+	return exists, err
+}
+
 // GetTransactionByID get transaction by userID and transactionID from the DB
 func (r *financialTransactionRepository) GetTransactionByID(userID int64, transactionID int64) (*models.FinancialTransaction, error) {
 	transaction := models.FinancialTransaction{}
 	err := r.db.QueryRow("SELECT * FROM transactions WHERE user_id=$1 AND id=$2;", userID, transactionID).Scan(
 		&transaction.ID, &transaction.UserID, &transaction.ItemID, &transaction.AccountID,
 		&transaction.CategoryID, &transaction.DailyAccountSnapshotID, &transaction.MonthlyAccountSnapshotID,
-		&transaction.PlaidCategoryID, &transaction.PlaidTransactionID, &transaction.Name, &transaction.Amount,
-		&transaction.Date, &transaction.Pending)
+		&transaction.PlaidCategoryID, &transaction.PlaidTransactionID, &transaction.Name,
+		&transaction.Amount, &transaction.Date, &transaction.Pending, &transaction.PlaidAccountID)
 	return &transaction, err
 }
 
@@ -52,8 +60,8 @@ func (r *financialTransactionRepository) GetTransactionByPlaidID(userID int64, p
 	err := r.db.QueryRow("SELECT * FROM transactions WHERE user_id=$1 AND plaid_transaction_id=$2;", userID, plaidTransactionID).Scan(
 		&transaction.ID, &transaction.UserID, &transaction.ItemID, &transaction.AccountID,
 		&transaction.CategoryID, &transaction.DailyAccountSnapshotID, &transaction.MonthlyAccountSnapshotID,
-		&transaction.PlaidCategoryID, &transaction.PlaidTransactionID, &transaction.Name, &transaction.Amount,
-		&transaction.Date, &transaction.Pending)
+		&transaction.PlaidCategoryID, &transaction.PlaidTransactionID, &transaction.Name,
+		&transaction.Amount, &transaction.Date, &transaction.Pending, &transaction.PlaidAccountID)
 	return &transaction, err
 }
 
@@ -72,8 +80,8 @@ func (r *financialTransactionRepository) GetAccountTransactions(userID int64, ac
 		err := rows.Scan(
 			&transaction.ID, &transaction.UserID, &transaction.ItemID, &transaction.AccountID,
 			&transaction.CategoryID, &transaction.DailyAccountSnapshotID, &transaction.MonthlyAccountSnapshotID,
-			&transaction.PlaidCategoryID, &transaction.PlaidTransactionID, &transaction.Name, &transaction.Amount,
-			&transaction.Date, &transaction.Pending)
+			&transaction.PlaidCategoryID, &transaction.PlaidTransactionID, &transaction.Name,
+			&transaction.Amount, &transaction.Date, &transaction.Pending, &transaction.PlaidAccountID)
 		if err != nil {
 			return nil, err
 		}
@@ -98,8 +106,8 @@ func (r *financialTransactionRepository) GetItemTransactions(userID int64, itemI
 		err := rows.Scan(
 			&transaction.ID, &transaction.UserID, &transaction.ItemID, &transaction.AccountID,
 			&transaction.CategoryID, &transaction.DailyAccountSnapshotID, &transaction.MonthlyAccountSnapshotID,
-			&transaction.PlaidCategoryID, &transaction.PlaidTransactionID, &transaction.Name, &transaction.Amount,
-			&transaction.Date, &transaction.Pending)
+			&transaction.PlaidCategoryID, &transaction.PlaidTransactionID, &transaction.Name,
+			&transaction.Amount, &transaction.Date, &transaction.Pending, &transaction.PlaidAccountID)
 		if err != nil {
 			return nil, err
 		}
@@ -124,8 +132,8 @@ func (r *financialTransactionRepository) GetUserTransactions(userID int64) ([]mo
 		err := rows.Scan(
 			&transaction.ID, &transaction.UserID, &transaction.ItemID, &transaction.AccountID,
 			&transaction.CategoryID, &transaction.DailyAccountSnapshotID, &transaction.MonthlyAccountSnapshotID,
-			&transaction.PlaidCategoryID, &transaction.PlaidTransactionID, &transaction.Name, &transaction.Amount,
-			&transaction.Date, &transaction.Pending)
+			&transaction.PlaidCategoryID, &transaction.PlaidTransactionID, &transaction.Name,
+			&transaction.Amount, &transaction.Date, &transaction.Pending, &transaction.PlaidAccountID)
 		if err != nil {
 			return nil, err
 		}

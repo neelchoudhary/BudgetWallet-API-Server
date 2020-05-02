@@ -11,6 +11,7 @@ type FinancialTransaction struct {
 	CategoryID               int64   `json:"category_id"`
 	DailyAccountSnapshotID   int64   `json:"daily_account_snapshot_id"`
 	MonthlyAccountSnapshotID int64   `json:"monthly_account_snapshot_id"`
+	PlaidAccountID           string  `json:"plaid_account_id"`
 	PlaidCategoryID          string  `json:"plaid_category_id"`
 	PlaidTransactionID       string  `json:"plaid_transaction_id"`
 	Name                     string  `json:"name"`
@@ -20,25 +21,37 @@ type FinancialTransaction struct {
 }
 
 // NewFinancialTransactionFromPlaid creates a new financial transaction from a plaid transaction
-func NewFinancialTransactionFromPlaid(userID int64, itemID int64, accountID int64, categoryID int64, plaidTransaction plaid.Transaction) *FinancialTransaction {
-	transaction := FinancialTransaction{}
-	transaction.UserID = userID
-	transaction.ItemID = itemID
-	transaction.AccountID = accountID
-	transaction.CategoryID = categoryID
-	transaction.PlaidCategoryID = plaidTransaction.CategoryID
-	transaction.PlaidTransactionID = plaidTransaction.ID
-	transaction.Name = plaidTransaction.Name
-	transaction.Amount = plaidTransaction.Amount
-	transaction.Date = plaidTransaction.Date
-	transaction.Pending = plaidTransaction.Pending
-	return &transaction
+func NewFinancialTransactionFromPlaid(userID int64, itemID int64, plaidTransaction plaid.Transaction) FinancialTransaction {
+	transaction := FinancialTransaction{
+		UserID:             userID,
+		ItemID:             itemID,
+		PlaidAccountID:     plaidTransaction.AccountID,
+		PlaidCategoryID:    plaidTransaction.CategoryID,
+		PlaidTransactionID: plaidTransaction.ID,
+		Name:               plaidTransaction.Name,
+		Amount:             plaidTransaction.Amount,
+		Date:               plaidTransaction.Date,
+		Pending:            plaidTransaction.Pending,
+	}
+	return transaction
+}
+
+// FilterTransactions filter transactions
+func FilterTransactions(ls []FinancialTransaction, f func(FinancialTransaction) bool) []FinancialTransaction {
+	fls := make([]FinancialTransaction, 0)
+	for _, v := range ls {
+		if f(v) {
+			fls = append(fls, v)
+		}
+	}
+	return fls
 }
 
 // FinancialTransactionRepository interface
 type FinancialTransactionRepository interface {
 	AddTransaction(transaction *FinancialTransaction) error
 	UpdateTransaction(userID int64, transactionID int64, transaction *FinancialTransaction) error
+	DoesTransactionExist(userID int64, plaidTransactionID string) (bool, error)
 	GetTransactionByID(userID int64, transactionID int64) (*FinancialTransaction, error)
 	GetTransactionByPlaidID(userID int64, plaidTransactionID string) (*FinancialTransaction, error)
 	GetAccountTransactions(userID int64, accountID int64) ([]FinancialTransaction, error)
