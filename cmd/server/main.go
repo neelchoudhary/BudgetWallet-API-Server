@@ -53,7 +53,7 @@ func main() {
 
 	// Create Services
 	authService := auth.NewAuthServiceServer(&authRepo, jwtManager)
-	userFinancesService := userfinances.NewUserFinancesServer(&itemRepo, &accountRepo)
+	userFinancesService := userfinances.NewUserFinancesServer(&itemRepo, &accountRepo, &transactionRepo)
 	plaidFinancesService := plaidfinances.NewPlaidFinancesServer(&itemRepo, &accountRepo, &transactionRepo, plaidClient)
 
 	// Create Server

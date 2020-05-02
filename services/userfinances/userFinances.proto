@@ -5,41 +5,6 @@ option go_package="github.com/neelchoudhary/budgetwallet-api-server/services/use
 
 import "services/shared/shared.proto";
 
-// message FinancialAccount {
-//     int64 id = 1;
-//     int64 user_id = 2;
-//     int64 item_id = 3;
-//     string plaid_account_id = 4;
-//     double current_balance = 5;
-//     string account_name = 6;
-//     string official_name = 7;
-//     string account_type = 8;
-//     string account_subtype = 9;
-//     string account_mask = 10;
-//     bool selected = 11;
-// }
-
-// message FinancialInstitution {
-//     int64 id = 1;
-//     string institution_name = 2;
-//     string institution_color = 3;
-//     string institution_logo = 4;
-// }
-
-// message Transaction {
-//     int64 id = 1;
-//     int64 user_id = 2;
-//     int64 item_id = 3;
-//     int64 account_id = 4;
-//     int64 category_id = 5;
-//     string plaid_category_id = 6;
-//     string plaid_transaction_id = 7;
-//     string name = 8;
-//     double amount = 9;
-//     string date = 10;
-//     bool pending = 11;
-// }
-
 message GetFinancialInstitutionsRequest {
     int64 user_id = 1;
 }
@@ -68,18 +33,18 @@ message ToggleFinancialAccountResponse {
     bool success = 1;
 }
 
-message GetTransactionsRequest {
+message GetFinancialTransactionsRequest {
     int64 user_id = 1;
     int64 item_id = 2;
 }
 
-message GetTransactionsResponse {
-    repeated shared.Transaction transactions = 1;
+message GetFinancialTransactionsResponse {
+    repeated shared.FinancialTransaction financial_transactions = 1;
 }
 
 service UserFinancesService {
     rpc GetFinancialInstitutions(GetFinancialInstitutionsRequest) returns (GetFinancialInstitutionsResponse) {};
     rpc GetFinancialAccounts(GetFinancialAccountsRequest) returns (GetFinancialAccountsResponse) {};
     rpc ToggleFinancialAccount(ToggleFinancialAccountRequest) returns (ToggleFinancialAccountResponse) {};
-    rpc GetTransactions(GetTransactionsRequest) returns (GetTransactionsResponse) {};
+    rpc GetFinancialTransactions(GetFinancialTransactionsRequest) returns (GetFinancialTransactionsResponse) {};
 }

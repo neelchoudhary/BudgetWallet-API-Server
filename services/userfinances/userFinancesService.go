@@ -12,13 +12,14 @@ import (
 
 // Service UserFinancesService struct
 type Service struct {
-	financialItemRepo    models.FinancialItemRepository
-	financialAccountRepo models.FinancialAccountRepository
+	financialItemRepo        models.FinancialItemRepository
+	financialAccountRepo     models.FinancialAccountRepository
+	financialTransactionRepo models.FinancialTransactionRepository
 }
 
 // NewUserFinancesServer contructor to assign repo
-func NewUserFinancesServer(itemRepo *models.FinancialItemRepository, accountRepo *models.FinancialAccountRepository) UserFinancesServiceServer {
-	return &Service{financialItemRepo: *itemRepo, financialAccountRepo: *accountRepo}
+func NewUserFinancesServer(itemRepo *models.FinancialItemRepository, accountRepo *models.FinancialAccountRepository, financialTransactionRepo *models.FinancialTransactionRepository) UserFinancesServiceServer {
+	return &Service{financialItemRepo: *itemRepo, financialAccountRepo: *accountRepo, financialTransactionRepo: *financialTransactionRepo}
 }
 
 // GetFinancialInstitutions get financial institutions from DB for a user
@@ -73,9 +74,21 @@ func (s *Service) ToggleFinancialAccount(ctx context.Context, req *ToggleFinanci
 	return res, nil
 }
 
-// GetTransactions get all transactions for a user's item
-func (s *Service) GetTransactions(ctx context.Context, req *GetTransactionsRequest) (*GetTransactionsResponse, error) {
-	return nil, nil
+// GetFinancialTransactions get all transactions for a user's item
+func (s *Service) GetFinancialTransactions(ctx context.Context, req *GetFinancialTransactionsRequest) (*GetFinancialTransactionsResponse, error) {
+	transactions, err := s.financialTransactionRepo.GetItemTransactions(req.UserId, req.ItemId)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, fmt.Sprintf("Repo error getting transactions: %s", err.Error()))
+	}
+	var pbTransactions []*shared.FinancialTransaction
+	for _, transaction := range transactions {
+		pbTransactions = append(pbTransactions, dataToTransactionPb(transaction))
+	}
+
+	res := &GetFinancialTransactionsResponse{
+		FinancialTransactions: pbTransactions,
+	}
+	return res, nil
 }
 
 func dataToItemPb(data models.FinancialItem) *shared.FinancialInstitution {
@@ -100,5 +113,21 @@ func dataToAccountPb(data models.FinancialAccount) *shared.FinancialAccount {
 		AccountSubtype: data.AccountSubType,
 		AccountMask:    data.AccountMask,
 		Selected:       data.Selected,
+	}
+}
+
+func dataToTransactionPb(data models.FinancialTransaction) *shared.FinancialTransaction {
+	return &shared.FinancialTransaction{
+		Id:                 data.ID,
+		UserId:             data.UserID,
+		ItemId:             data.ItemID,
+		AccountId:          data.AccountID,
+		CategoryId:         data.CategoryID,
+		PlaidCategoryId:    data.PlaidCategoryID,
+		PlaidTransactionId: data.PlaidTransactionID,
+		Name:               data.Name,
+		Amount:             data.Amount,
+		Date:               data.Date,
+		Pending:            data.Pending,
 	}
 }

@@ -24,7 +24,7 @@ message FinancialInstitution {
     string institution_logo = 4;
 }
 
-message Transaction {
+message FinancialTransaction {
     int64 id = 1;
     int64 user_id = 2;
     int64 item_id = 3;
