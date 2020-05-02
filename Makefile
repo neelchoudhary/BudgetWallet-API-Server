@@ -2,7 +2,7 @@
 ENV := local
 # DB URL is always local
 DB_URL := "postgres://postgres:password@localhost:5432/budget_manager?sslmode=disable"
-MIGRATE := migrate -path=db/migrations -database "$(DB_URL)"
+MIGRATE := migrate -path=postgresql/migrations -database "$(DB_URL)"
 
 .PHONY: default
 default: help
