@@ -35,6 +35,9 @@ func main() {
 
 	flag.Parse()
 
+	// Enable Logging
+	utils.InitializeLogs()
+
 	// Create configs from flags
 	dbConfig := config.NewDBConfig(*dbHost, *dbPort, *dbUser, *dbPassword, *dbName)
 	serverConfig := config.NewServerConfig(*serverEnv, *serverHost, *serverAPIPort, *serverWebhookPort, *serverTLSKeyPath, *serverTLSCertPath)
@@ -46,6 +49,7 @@ func main() {
 	plaidClient := config.ConnectToPlaid(plaidConfig)
 
 	// Create data repositories
+	txRepo := postgresql.NewTxRepository(db)
 	authRepo := postgresql.NewUserRepository(db)
 	itemRepo := postgresql.NewFinancialItemRepository(db)
 	accountRepo := postgresql.NewFinancialAccountRepository(db)
@@ -53,8 +57,8 @@ func main() {
 
 	// Create Services
 	authService := auth.NewAuthServiceServer(&authRepo, jwtManager)
-	userFinancesService := userfinances.NewUserFinancesServer(&itemRepo, &accountRepo, &transactionRepo)
-	plaidFinancesService := plaidfinances.NewPlaidFinancesServer(&itemRepo, &accountRepo, &transactionRepo, plaidClient)
+	userFinancesService := userfinances.NewUserFinancesServer(&txRepo, &itemRepo, &accountRepo, &transactionRepo)
+	plaidFinancesService := plaidfinances.NewPlaidFinancesServer(&txRepo, &itemRepo, &accountRepo, &transactionRepo, plaidClient)
 
 	// Create Server
 	srv := NewServer(serverConfig, jwtManager, &authService, &userFinancesService, &plaidFinancesService)

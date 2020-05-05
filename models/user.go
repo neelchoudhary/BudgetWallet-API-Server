@@ -30,7 +30,7 @@ func (u *User) Login(password string, jwtManager *utils.JWTManager) (string, err
 
 		tokenString, err := jwtManager.CreateToken(u.ID)
 		if err != nil {
-			return "", err
+			return "", utils.InternalServerError
 		}
 
 		return tokenString, nil

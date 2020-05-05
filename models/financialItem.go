@@ -1,6 +1,7 @@
 package models
 
 import (
+	"database/sql"
 	"errors"
 	"time"
 
@@ -156,23 +157,13 @@ func (i *FinancialItem) RemoveItemFromPlaid(plaidClient *plaid.Client) error {
 	return nil
 }
 
-// // GetAccessToken get the access token field
-// func (i *FinancialItem) GetAccessToken() string {
-// 	return i.PlaidAccessToken
-// }
-
-// // GetItemID get the item's ID field
-// func (i *FinancialItem) GetItemID() int64 {
-// 	return i.ID
-// }
-
 // FinancialItemRepository interface
 type FinancialItemRepository interface {
-	AddItem(item *FinancialItem) error
-	UpdateItem(userID int64, itemID int64, item *FinancialItem) error
-	GetItemByID(userID int64, itemID int64) (*FinancialItem, error)
-	GetItemByPlaidID(userID int64, plaidItemID string) (*FinancialItem, error)
-	GetUserItems(userID int64) ([]FinancialItem, error)
-	RemoveItem(userID int64, itemID int64) error
-	RemoveUserItems(userID int64) error
+	AddItem(tx *sql.Tx, item *FinancialItem) error
+	UpdateItem(tx *sql.Tx, userID int64, itemID int64, item *FinancialItem) error
+	GetItemByID(tx *sql.Tx, userID int64, itemID int64) (*FinancialItem, error)
+	GetItemByPlaidID(tx *sql.Tx, userID int64, plaidItemID string) (*FinancialItem, error)
+	GetUserItems(tx *sql.Tx, userID int64) ([]FinancialItem, error)
+	RemoveItem(tx *sql.Tx, userID int64, itemID int64) error
+	RemoveUserItems(tx *sql.Tx, userID int64) error
 }

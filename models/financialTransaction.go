@@ -1,6 +1,10 @@
 package models
 
-import "github.com/plaid/plaid-go/plaid"
+import (
+	"database/sql"
+
+	"github.com/plaid/plaid-go/plaid"
+)
 
 // FinancialTransaction ...
 type FinancialTransaction struct {
@@ -49,14 +53,14 @@ func FilterTransactions(ls []FinancialTransaction, f func(FinancialTransaction) 
 
 // FinancialTransactionRepository interface
 type FinancialTransactionRepository interface {
-	AddTransaction(transaction *FinancialTransaction) error
-	UpdateTransaction(userID int64, transactionID int64, transaction *FinancialTransaction) error
-	DoesTransactionExist(userID int64, plaidTransactionID string) (bool, error)
-	GetTransactionByID(userID int64, transactionID int64) (*FinancialTransaction, error)
-	GetTransactionByPlaidID(userID int64, plaidTransactionID string) (*FinancialTransaction, error)
-	GetAccountTransactions(userID int64, accountID int64) ([]FinancialTransaction, error)
-	GetItemTransactions(userID int64, itemID int64) ([]FinancialTransaction, error)
-	GetUserTransactions(userID int64) ([]FinancialTransaction, error)
-	RemoveItemTransactions(userID int64, itemID int64) error
-	RemoveUserTransactions(userID int64) error
+	AddTransaction(tx *sql.Tx, transaction *FinancialTransaction) error
+	UpdateTransaction(tx *sql.Tx, userID int64, transactionID int64, transaction *FinancialTransaction) error
+	DoesTransactionExist(tx *sql.Tx, userID int64, plaidTransactionID string) (bool, error)
+	GetTransactionByID(tx *sql.Tx, userID int64, transactionID int64) (*FinancialTransaction, error)
+	GetTransactionByPlaidID(tx *sql.Tx, userID int64, plaidTransactionID string) (*FinancialTransaction, error)
+	GetAccountTransactions(tx *sql.Tx, userID int64, accountID int64) ([]FinancialTransaction, error)
+	GetItemTransactions(tx *sql.Tx, userID int64, itemID int64) ([]FinancialTransaction, error)
+	GetUserTransactions(tx *sql.Tx, userID int64) ([]FinancialTransaction, error)
+	RemoveItemTransactions(tx *sql.Tx, userID int64, itemID int64) error
+	RemoveUserTransactions(tx *sql.Tx, userID int64) error
 }

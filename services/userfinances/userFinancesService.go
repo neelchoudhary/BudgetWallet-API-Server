@@ -4,34 +4,57 @@ import (
 	context "context"
 	fmt "fmt"
 
+	"github.com/neelchoudhary/budgetwallet-api-server/postgresql"
+	"github.com/neelchoudhary/budgetwallet-api-server/utils"
+
 	"github.com/neelchoudhary/budgetwallet-api-server/models"
 	shared "github.com/neelchoudhary/budgetwallet-api-server/services/shared"
-	codes "google.golang.org/grpc/codes"
-	status "google.golang.org/grpc/status"
+	log "github.com/sirupsen/logrus"
 )
+
+var logger = func(methodName string, err error) *log.Entry {
+	if err != nil {
+		return log.WithFields(log.Fields{"service": "UserFinancesService", "method": methodName, "error": err.Error()})
+	}
+	return log.WithFields(log.Fields{"service": "UserFinancesService", "method": methodName})
+}
 
 // Service UserFinancesService struct
 type Service struct {
+	txRepo                   postgresql.TxRepository
 	financialItemRepo        models.FinancialItemRepository
 	financialAccountRepo     models.FinancialAccountRepository
 	financialTransactionRepo models.FinancialTransactionRepository
 }
 
 // NewUserFinancesServer contructor to assign repo
-func NewUserFinancesServer(itemRepo *models.FinancialItemRepository, accountRepo *models.FinancialAccountRepository, financialTransactionRepo *models.FinancialTransactionRepository) UserFinancesServiceServer {
-	return &Service{financialItemRepo: *itemRepo, financialAccountRepo: *accountRepo, financialTransactionRepo: *financialTransactionRepo}
+func NewUserFinancesServer(txRepo *postgresql.TxRepository, itemRepo *models.FinancialItemRepository, accountRepo *models.FinancialAccountRepository, financialTransactionRepo *models.FinancialTransactionRepository) UserFinancesServiceServer {
+	return &Service{txRepo: *txRepo, financialItemRepo: *itemRepo, financialAccountRepo: *accountRepo, financialTransactionRepo: *financialTransactionRepo}
 }
 
 // GetFinancialInstitutions get financial institutions from DB for a user
 func (s *Service) GetFinancialInstitutions(ctx context.Context, req *GetFinancialInstitutionsRequest) (*GetFinancialInstitutionsResponse, error) {
-	items, err := s.financialItemRepo.GetUserItems(req.GetUserId())
+	tx, err := s.txRepo.StartTx(ctx)
 	if err != nil {
-		return nil, status.Errorf(codes.Internal, fmt.Sprintf("Repo error getting items: %s", err.Error()))
+		logger("GetFinancialInstitutions", err).Error(utils.StartTxErrorMsg)
+		return nil, utils.InternalServerError
+	}
+
+	items, err := s.financialItemRepo.GetUserItems(tx, req.GetUserId())
+	if err != nil {
+		logger("GetFinancialInstitutions", err).Error(fmt.Sprintf("Repo call to GetUserItems failed"))
+		return nil, utils.InternalServerError
 	}
 
 	var pbItems []*shared.FinancialInstitution
 	for _, item := range items {
 		pbItems = append(pbItems, dataToItemPb(item))
+	}
+
+	err = s.txRepo.CommitTx(tx)
+	if err != nil {
+		logger("GetFinancialInstitutions", err).Error(utils.CommitTxErrorMsg)
+		return nil, err
 	}
 
 	res := &GetFinancialInstitutionsResponse{
@@ -42,13 +65,26 @@ func (s *Service) GetFinancialInstitutions(ctx context.Context, req *GetFinancia
 
 // GetFinancialAccounts get financial accounts from DB for a user's item
 func (s *Service) GetFinancialAccounts(ctx context.Context, req *GetFinancialAccountsRequest) (*GetFinancialAccountsResponse, error) {
-	accounts, err := s.financialAccountRepo.GetItemAccounts(req.UserId, req.ItemId)
+	tx, err := s.txRepo.StartTx(ctx)
 	if err != nil {
-		return nil, status.Errorf(codes.Internal, fmt.Sprintf("Repo error getting accounts: %s", err.Error()))
+		logger("GetFinancialAccounts", err).Error(utils.StartTxErrorMsg)
+		return nil, utils.InternalServerError
+	}
+
+	accounts, err := s.financialAccountRepo.GetItemAccounts(tx, req.UserId, req.ItemId)
+	if err != nil {
+		logger("GetFinancialAccounts", err).Error(fmt.Sprintf("Repo call to GetItemAccounts failed"))
+		return nil, utils.InternalServerError
 	}
 	var pbAccounts []*shared.FinancialAccount
 	for _, account := range accounts {
 		pbAccounts = append(pbAccounts, dataToAccountPb(account))
+	}
+
+	err = s.txRepo.CommitTx(tx)
+	if err != nil {
+		logger("GetFinancialAccounts", err).Error(utils.CommitTxErrorMsg)
+		return nil, err
 	}
 
 	res := &GetFinancialAccountsResponse{
@@ -59,15 +95,30 @@ func (s *Service) GetFinancialAccounts(ctx context.Context, req *GetFinancialAcc
 
 // ToggleFinancialAccount toggle the selected property of a financial account for a user's item
 func (s *Service) ToggleFinancialAccount(ctx context.Context, req *ToggleFinancialAccountRequest) (*ToggleFinancialAccountResponse, error) {
-	account, err := s.financialAccountRepo.GetAccountByID(req.GetUserId(), req.GetAccountId())
+	tx, err := s.txRepo.StartTx(ctx)
 	if err != nil {
-		return nil, status.Errorf(codes.Internal, fmt.Sprintf("Repo error getting account by id: %s", err.Error()))
+		logger("ToggleFinancialAccount", err).Error(utils.StartTxErrorMsg)
+		return nil, utils.InternalServerError
+	}
+
+	account, err := s.financialAccountRepo.GetAccountByID(tx, req.GetUserId(), req.GetAccountId())
+	if err != nil {
+		logger("ToggleFinancialAccount", err).Error(fmt.Sprintf("Repo call to GetAccountByID failed"))
+		return nil, utils.InternalServerError
 	}
 	account.SetSelected(req.GetSelected())
-	err = s.financialAccountRepo.UpdateAccount(req.GetUserId(), req.GetAccountId(), account)
+	err = s.financialAccountRepo.UpdateAccount(tx, req.GetUserId(), req.GetAccountId(), account)
 	if err != nil {
-		return nil, status.Errorf(codes.Internal, fmt.Sprintf("Repo error updatinig account: %s", err.Error()))
+		logger("ToggleFinancialAccount", err).Error(fmt.Sprintf("Repo call to UpdateAccount failed"))
+		return nil, utils.InternalServerError
 	}
+
+	err = s.txRepo.CommitTx(tx)
+	if err != nil {
+		logger("ToggleFinancialAccount", err).Error(utils.CommitTxErrorMsg)
+		return nil, err
+	}
+
 	res := &ToggleFinancialAccountResponse{
 		Success: true,
 	}
@@ -76,13 +127,26 @@ func (s *Service) ToggleFinancialAccount(ctx context.Context, req *ToggleFinanci
 
 // GetFinancialTransactions get all transactions for a user's item
 func (s *Service) GetFinancialTransactions(ctx context.Context, req *GetFinancialTransactionsRequest) (*GetFinancialTransactionsResponse, error) {
-	transactions, err := s.financialTransactionRepo.GetItemTransactions(req.UserId, req.ItemId)
+	tx, err := s.txRepo.StartTx(ctx)
 	if err != nil {
-		return nil, status.Errorf(codes.Internal, fmt.Sprintf("Repo error getting transactions: %s", err.Error()))
+		logger("GetFinancialTransactions", err).Error(utils.StartTxErrorMsg)
+		return nil, utils.InternalServerError
+	}
+
+	transactions, err := s.financialTransactionRepo.GetItemTransactions(tx, req.UserId, req.ItemId)
+	if err != nil {
+		logger("GetFinancialTransactions", err).Error(fmt.Sprintf("Repo call to GetItemTransactions failed"))
+		return nil, utils.InternalServerError
 	}
 	var pbTransactions []*shared.FinancialTransaction
 	for _, transaction := range transactions {
 		pbTransactions = append(pbTransactions, dataToTransactionPb(transaction))
+	}
+
+	err = s.txRepo.CommitTx(tx)
+	if err != nil {
+		logger("GetFinancialTransactions", err).Error(utils.CommitTxErrorMsg)
+		return nil, err
 	}
 
 	res := &GetFinancialTransactionsResponse{

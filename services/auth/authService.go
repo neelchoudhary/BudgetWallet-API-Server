@@ -5,12 +5,21 @@ import (
 	"fmt"
 	"time"
 
+	log "github.com/sirupsen/logrus"
+
 	"github.com/neelchoudhary/budgetwallet-api-server/models"
 	"github.com/neelchoudhary/budgetwallet-api-server/utils"
 	"golang.org/x/crypto/bcrypt"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
+
+var logger = func(methodName string, err error) *log.Entry {
+	if err != nil {
+		return log.WithFields(log.Fields{"service": "AuthService", "method": methodName, "error": err.Error()})
+	}
+	return log.WithFields(log.Fields{"service": "AuthService", "method": methodName})
+}
 
 // Service ...
 type Service struct {
@@ -19,8 +28,8 @@ type Service struct {
 }
 
 // NewAuthServiceServer contructor to assign repo
-func NewAuthServiceServer(repository *models.UserRepository, jwtManager *utils.JWTManager) AuthServiceServer {
-	return &Service{userRepo: *repository, jwtManager: jwtManager}
+func NewAuthServiceServer(userRepo *models.UserRepository, jwtManager *utils.JWTManager) AuthServiceServer {
+	return &Service{userRepo: *userRepo, jwtManager: jwtManager}
 }
 
 // Signup ...
@@ -28,13 +37,14 @@ func (s *Service) Signup(ctx context.Context, req *SignupRequest) (*SignupRespon
 	// Check if email already exists in db
 	signUpUser := req.GetSignUpUser()
 	if signUpUser.GetFullname() == "" || signUpUser.GetEmail() == "" || signUpUser.GetPassword() == "" {
+		logger("Signup", nil).Info("Invalid Arguments, all fields are required")
 		return nil, status.Errorf(codes.InvalidArgument, fmt.Sprintf("All fields are required"))
 	}
 
 	hash, err := bcrypt.GenerateFromPassword([]byte(signUpUser.GetPassword()), 10)
-
 	if err != nil {
-		return nil, status.Errorf(codes.Internal, fmt.Sprintf("Failed to hash password: %s", err.Error()))
+		logger("Signup", err).Info("Failed to generate hash from passsword")
+		return nil, utils.InternalServerError
 	}
 	//uniqueID := uuid.NewV4()
 	newUser := User{
@@ -45,7 +55,8 @@ func (s *Service) Signup(ctx context.Context, req *SignupRequest) (*SignupRespon
 	}
 	err = s.userRepo.CreateUser(*signUpPbToData(newUser))
 	if err != nil {
-		return nil, status.Errorf(codes.Internal, fmt.Sprintf("Repo error creating user: %s", err.Error()))
+		logger("Signup", err).Info("Repo call to CreateUser failed")
+		return nil, utils.InternalServerError
 	}
 
 	res := &SignupResponse{
@@ -61,9 +72,15 @@ func (s *Service) Login(ctx context.Context, req *LoginRequest) (*LoginResponse,
 	email := loginUser.GetEmail()
 	password := loginUser.GetPassword()
 	userToLogIn, err := s.userRepo.GetUserByEmail(email)
-	tokenString, err := userToLogIn.Login(password, s.jwtManager)
 	if err != nil {
-		return nil, status.Errorf(codes.Internal, fmt.Sprintf("User error logging in: %s", err.Error()))
+		logger("Login", err).Info("Repo call to GetUserByEmail failed")
+		return nil, utils.InternalServerError
+	}
+	tokenString, err := userToLogIn.Login(password, s.jwtManager)
+	// Returns grpc formatted error
+	if err != nil {
+		logger("Login", err).Info("User call to Login failed")
+		return nil, err
 	}
 
 	res := &LoginResponse{
