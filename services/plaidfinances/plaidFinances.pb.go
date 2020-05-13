@@ -432,90 +432,253 @@ func (m *RemoveFinancialInstitutionResponse) GetSuccess() bool {
 	return false
 }
 
-type AddTransactionsRequest struct {
+type AddHistoricalFinancialTransactionsRequest struct {
 	UserId               int64    `protobuf:"varint,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
 	ItemId               int64    `protobuf:"varint,2,opt,name=item_id,json=itemId,proto3" json:"item_id,omitempty"`
+	PlaidItemId          string   `protobuf:"bytes,3,opt,name=plaid_item_id,json=plaidItemId,proto3" json:"plaid_item_id,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
 }
 
-func (m *AddTransactionsRequest) Reset()         { *m = AddTransactionsRequest{} }
-func (m *AddTransactionsRequest) String() string { return proto.CompactTextString(m) }
-func (*AddTransactionsRequest) ProtoMessage()    {}
-func (*AddTransactionsRequest) Descriptor() ([]byte, []int) {
+func (m *AddHistoricalFinancialTransactionsRequest) Reset() {
+	*m = AddHistoricalFinancialTransactionsRequest{}
+}
+func (m *AddHistoricalFinancialTransactionsRequest) String() string { return proto.CompactTextString(m) }
+func (*AddHistoricalFinancialTransactionsRequest) ProtoMessage()    {}
+func (*AddHistoricalFinancialTransactionsRequest) Descriptor() ([]byte, []int) {
 	return fileDescriptor_55420273247af5e9, []int{9}
 }
 
-func (m *AddTransactionsRequest) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_AddTransactionsRequest.Unmarshal(m, b)
+func (m *AddHistoricalFinancialTransactionsRequest) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_AddHistoricalFinancialTransactionsRequest.Unmarshal(m, b)
 }
-func (m *AddTransactionsRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_AddTransactionsRequest.Marshal(b, m, deterministic)
+func (m *AddHistoricalFinancialTransactionsRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_AddHistoricalFinancialTransactionsRequest.Marshal(b, m, deterministic)
 }
-func (m *AddTransactionsRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_AddTransactionsRequest.Merge(m, src)
+func (m *AddHistoricalFinancialTransactionsRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_AddHistoricalFinancialTransactionsRequest.Merge(m, src)
 }
-func (m *AddTransactionsRequest) XXX_Size() int {
-	return xxx_messageInfo_AddTransactionsRequest.Size(m)
+func (m *AddHistoricalFinancialTransactionsRequest) XXX_Size() int {
+	return xxx_messageInfo_AddHistoricalFinancialTransactionsRequest.Size(m)
 }
-func (m *AddTransactionsRequest) XXX_DiscardUnknown() {
-	xxx_messageInfo_AddTransactionsRequest.DiscardUnknown(m)
+func (m *AddHistoricalFinancialTransactionsRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_AddHistoricalFinancialTransactionsRequest.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_AddTransactionsRequest proto.InternalMessageInfo
+var xxx_messageInfo_AddHistoricalFinancialTransactionsRequest proto.InternalMessageInfo
 
-func (m *AddTransactionsRequest) GetUserId() int64 {
+func (m *AddHistoricalFinancialTransactionsRequest) GetUserId() int64 {
 	if m != nil {
 		return m.UserId
 	}
 	return 0
 }
 
-func (m *AddTransactionsRequest) GetItemId() int64 {
+func (m *AddHistoricalFinancialTransactionsRequest) GetItemId() int64 {
 	if m != nil {
 		return m.ItemId
 	}
 	return 0
 }
 
-type AddTransactionsResponse struct {
-	Success              bool     `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`
+func (m *AddHistoricalFinancialTransactionsRequest) GetPlaidItemId() string {
+	if m != nil {
+		return m.PlaidItemId
+	}
+	return ""
+}
+
+type AddHistoricalFinancialTransactionsResponse struct {
+	NewTransactions      int64    `protobuf:"varint,1,opt,name=newTransactions,proto3" json:"newTransactions,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
 }
 
-func (m *AddTransactionsResponse) Reset()         { *m = AddTransactionsResponse{} }
-func (m *AddTransactionsResponse) String() string { return proto.CompactTextString(m) }
-func (*AddTransactionsResponse) ProtoMessage()    {}
-func (*AddTransactionsResponse) Descriptor() ([]byte, []int) {
+func (m *AddHistoricalFinancialTransactionsResponse) Reset() {
+	*m = AddHistoricalFinancialTransactionsResponse{}
+}
+func (m *AddHistoricalFinancialTransactionsResponse) String() string {
+	return proto.CompactTextString(m)
+}
+func (*AddHistoricalFinancialTransactionsResponse) ProtoMessage() {}
+func (*AddHistoricalFinancialTransactionsResponse) Descriptor() ([]byte, []int) {
 	return fileDescriptor_55420273247af5e9, []int{10}
 }
 
-func (m *AddTransactionsResponse) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_AddTransactionsResponse.Unmarshal(m, b)
+func (m *AddHistoricalFinancialTransactionsResponse) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_AddHistoricalFinancialTransactionsResponse.Unmarshal(m, b)
 }
-func (m *AddTransactionsResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_AddTransactionsResponse.Marshal(b, m, deterministic)
+func (m *AddHistoricalFinancialTransactionsResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_AddHistoricalFinancialTransactionsResponse.Marshal(b, m, deterministic)
 }
-func (m *AddTransactionsResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_AddTransactionsResponse.Merge(m, src)
+func (m *AddHistoricalFinancialTransactionsResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_AddHistoricalFinancialTransactionsResponse.Merge(m, src)
 }
-func (m *AddTransactionsResponse) XXX_Size() int {
-	return xxx_messageInfo_AddTransactionsResponse.Size(m)
+func (m *AddHistoricalFinancialTransactionsResponse) XXX_Size() int {
+	return xxx_messageInfo_AddHistoricalFinancialTransactionsResponse.Size(m)
 }
-func (m *AddTransactionsResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_AddTransactionsResponse.DiscardUnknown(m)
+func (m *AddHistoricalFinancialTransactionsResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_AddHistoricalFinancialTransactionsResponse.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_AddTransactionsResponse proto.InternalMessageInfo
+var xxx_messageInfo_AddHistoricalFinancialTransactionsResponse proto.InternalMessageInfo
 
-func (m *AddTransactionsResponse) GetSuccess() bool {
+func (m *AddHistoricalFinancialTransactionsResponse) GetNewTransactions() int64 {
 	if m != nil {
-		return m.Success
+		return m.NewTransactions
 	}
-	return false
+	return 0
+}
+
+type AddFinancialTransactionsRequest struct {
+	UserId               int64    `protobuf:"varint,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	ItemId               int64    `protobuf:"varint,2,opt,name=item_id,json=itemId,proto3" json:"item_id,omitempty"`
+	PlaidItemId          string   `protobuf:"bytes,3,opt,name=plaid_item_id,json=plaidItemId,proto3" json:"plaid_item_id,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *AddFinancialTransactionsRequest) Reset()         { *m = AddFinancialTransactionsRequest{} }
+func (m *AddFinancialTransactionsRequest) String() string { return proto.CompactTextString(m) }
+func (*AddFinancialTransactionsRequest) ProtoMessage()    {}
+func (*AddFinancialTransactionsRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_55420273247af5e9, []int{11}
+}
+
+func (m *AddFinancialTransactionsRequest) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_AddFinancialTransactionsRequest.Unmarshal(m, b)
+}
+func (m *AddFinancialTransactionsRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_AddFinancialTransactionsRequest.Marshal(b, m, deterministic)
+}
+func (m *AddFinancialTransactionsRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_AddFinancialTransactionsRequest.Merge(m, src)
+}
+func (m *AddFinancialTransactionsRequest) XXX_Size() int {
+	return xxx_messageInfo_AddFinancialTransactionsRequest.Size(m)
+}
+func (m *AddFinancialTransactionsRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_AddFinancialTransactionsRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_AddFinancialTransactionsRequest proto.InternalMessageInfo
+
+func (m *AddFinancialTransactionsRequest) GetUserId() int64 {
+	if m != nil {
+		return m.UserId
+	}
+	return 0
+}
+
+func (m *AddFinancialTransactionsRequest) GetItemId() int64 {
+	if m != nil {
+		return m.ItemId
+	}
+	return 0
+}
+
+func (m *AddFinancialTransactionsRequest) GetPlaidItemId() string {
+	if m != nil {
+		return m.PlaidItemId
+	}
+	return ""
+}
+
+type AddFinancialTransactionsResponse struct {
+	NewTransactions      int64    `protobuf:"varint,1,opt,name=newTransactions,proto3" json:"newTransactions,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *AddFinancialTransactionsResponse) Reset()         { *m = AddFinancialTransactionsResponse{} }
+func (m *AddFinancialTransactionsResponse) String() string { return proto.CompactTextString(m) }
+func (*AddFinancialTransactionsResponse) ProtoMessage()    {}
+func (*AddFinancialTransactionsResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_55420273247af5e9, []int{12}
+}
+
+func (m *AddFinancialTransactionsResponse) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_AddFinancialTransactionsResponse.Unmarshal(m, b)
+}
+func (m *AddFinancialTransactionsResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_AddFinancialTransactionsResponse.Marshal(b, m, deterministic)
+}
+func (m *AddFinancialTransactionsResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_AddFinancialTransactionsResponse.Merge(m, src)
+}
+func (m *AddFinancialTransactionsResponse) XXX_Size() int {
+	return xxx_messageInfo_AddFinancialTransactionsResponse.Size(m)
+}
+func (m *AddFinancialTransactionsResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_AddFinancialTransactionsResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_AddFinancialTransactionsResponse proto.InternalMessageInfo
+
+func (m *AddFinancialTransactionsResponse) GetNewTransactions() int64 {
+	if m != nil {
+		return m.NewTransactions
+	}
+	return 0
+}
+
+type RemoveFinancialTransactionsRequest struct {
+	UserId               int64    `protobuf:"varint,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	TransactionIds       []int64  `protobuf:"varint,2,rep,packed,name=transaction_ids,json=transactionIds,proto3" json:"transaction_ids,omitempty"`
+	PlaidTransactionIds  []string `protobuf:"bytes,3,rep,name=plaid_transaction_ids,json=plaidTransactionIds,proto3" json:"plaid_transaction_ids,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *RemoveFinancialTransactionsRequest) Reset()         { *m = RemoveFinancialTransactionsRequest{} }
+func (m *RemoveFinancialTransactionsRequest) String() string { return proto.CompactTextString(m) }
+func (*RemoveFinancialTransactionsRequest) ProtoMessage()    {}
+func (*RemoveFinancialTransactionsRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_55420273247af5e9, []int{13}
+}
+
+func (m *RemoveFinancialTransactionsRequest) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_RemoveFinancialTransactionsRequest.Unmarshal(m, b)
+}
+func (m *RemoveFinancialTransactionsRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_RemoveFinancialTransactionsRequest.Marshal(b, m, deterministic)
+}
+func (m *RemoveFinancialTransactionsRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_RemoveFinancialTransactionsRequest.Merge(m, src)
+}
+func (m *RemoveFinancialTransactionsRequest) XXX_Size() int {
+	return xxx_messageInfo_RemoveFinancialTransactionsRequest.Size(m)
+}
+func (m *RemoveFinancialTransactionsRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_RemoveFinancialTransactionsRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_RemoveFinancialTransactionsRequest proto.InternalMessageInfo
+
+func (m *RemoveFinancialTransactionsRequest) GetUserId() int64 {
+	if m != nil {
+		return m.UserId
+	}
+	return 0
+}
+
+func (m *RemoveFinancialTransactionsRequest) GetTransactionIds() []int64 {
+	if m != nil {
+		return m.TransactionIds
+	}
+	return nil
+}
+
+func (m *RemoveFinancialTransactionsRequest) GetPlaidTransactionIds() []string {
+	if m != nil {
+		return m.PlaidTransactionIds
+	}
+	return nil
 }
 
 type Empty struct {
@@ -528,7 +691,7 @@ func (m *Empty) Reset()         { *m = Empty{} }
 func (m *Empty) String() string { return proto.CompactTextString(m) }
 func (*Empty) ProtoMessage()    {}
 func (*Empty) Descriptor() ([]byte, []int) {
-	return fileDescriptor_55420273247af5e9, []int{11}
+	return fileDescriptor_55420273247af5e9, []int{14}
 }
 
 func (m *Empty) XXX_Unmarshal(b []byte) error {
@@ -549,84 +712,6 @@ func (m *Empty) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_Empty proto.InternalMessageInfo
 
-type AddPlaidCategoriesResponse struct {
-	Success              bool     `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
-}
-
-func (m *AddPlaidCategoriesResponse) Reset()         { *m = AddPlaidCategoriesResponse{} }
-func (m *AddPlaidCategoriesResponse) String() string { return proto.CompactTextString(m) }
-func (*AddPlaidCategoriesResponse) ProtoMessage()    {}
-func (*AddPlaidCategoriesResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_55420273247af5e9, []int{12}
-}
-
-func (m *AddPlaidCategoriesResponse) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_AddPlaidCategoriesResponse.Unmarshal(m, b)
-}
-func (m *AddPlaidCategoriesResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_AddPlaidCategoriesResponse.Marshal(b, m, deterministic)
-}
-func (m *AddPlaidCategoriesResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_AddPlaidCategoriesResponse.Merge(m, src)
-}
-func (m *AddPlaidCategoriesResponse) XXX_Size() int {
-	return xxx_messageInfo_AddPlaidCategoriesResponse.Size(m)
-}
-func (m *AddPlaidCategoriesResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_AddPlaidCategoriesResponse.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_AddPlaidCategoriesResponse proto.InternalMessageInfo
-
-func (m *AddPlaidCategoriesResponse) GetSuccess() bool {
-	if m != nil {
-		return m.Success
-	}
-	return false
-}
-
-type RemovePlaidCategoriesResponse struct {
-	Success              bool     `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
-}
-
-func (m *RemovePlaidCategoriesResponse) Reset()         { *m = RemovePlaidCategoriesResponse{} }
-func (m *RemovePlaidCategoriesResponse) String() string { return proto.CompactTextString(m) }
-func (*RemovePlaidCategoriesResponse) ProtoMessage()    {}
-func (*RemovePlaidCategoriesResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_55420273247af5e9, []int{13}
-}
-
-func (m *RemovePlaidCategoriesResponse) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_RemovePlaidCategoriesResponse.Unmarshal(m, b)
-}
-func (m *RemovePlaidCategoriesResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_RemovePlaidCategoriesResponse.Marshal(b, m, deterministic)
-}
-func (m *RemovePlaidCategoriesResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_RemovePlaidCategoriesResponse.Merge(m, src)
-}
-func (m *RemovePlaidCategoriesResponse) XXX_Size() int {
-	return xxx_messageInfo_RemovePlaidCategoriesResponse.Size(m)
-}
-func (m *RemovePlaidCategoriesResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_RemovePlaidCategoriesResponse.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_RemovePlaidCategoriesResponse proto.InternalMessageInfo
-
-func (m *RemovePlaidCategoriesResponse) GetSuccess() bool {
-	if m != nil {
-		return m.Success
-	}
-	return false
-}
-
 func init() {
 	proto.RegisterType((*Category)(nil), "plaidfinances.Category")
 	proto.RegisterType((*LinkFinancialInstitutionRequest)(nil), "plaidfinances.LinkFinancialInstitutionRequest")
@@ -637,11 +722,12 @@ func init() {
 	proto.RegisterType((*UpdateFinancialAccountsResponse)(nil), "plaidfinances.UpdateFinancialAccountsResponse")
 	proto.RegisterType((*RemoveFinancialInstitutionRequest)(nil), "plaidfinances.RemoveFinancialInstitutionRequest")
 	proto.RegisterType((*RemoveFinancialInstitutionResponse)(nil), "plaidfinances.RemoveFinancialInstitutionResponse")
-	proto.RegisterType((*AddTransactionsRequest)(nil), "plaidfinances.AddTransactionsRequest")
-	proto.RegisterType((*AddTransactionsResponse)(nil), "plaidfinances.AddTransactionsResponse")
+	proto.RegisterType((*AddHistoricalFinancialTransactionsRequest)(nil), "plaidfinances.AddHistoricalFinancialTransactionsRequest")
+	proto.RegisterType((*AddHistoricalFinancialTransactionsResponse)(nil), "plaidfinances.AddHistoricalFinancialTransactionsResponse")
+	proto.RegisterType((*AddFinancialTransactionsRequest)(nil), "plaidfinances.AddFinancialTransactionsRequest")
+	proto.RegisterType((*AddFinancialTransactionsResponse)(nil), "plaidfinances.AddFinancialTransactionsResponse")
+	proto.RegisterType((*RemoveFinancialTransactionsRequest)(nil), "plaidfinances.RemoveFinancialTransactionsRequest")
 	proto.RegisterType((*Empty)(nil), "plaidfinances.Empty")
-	proto.RegisterType((*AddPlaidCategoriesResponse)(nil), "plaidfinances.AddPlaidCategoriesResponse")
-	proto.RegisterType((*RemovePlaidCategoriesResponse)(nil), "plaidfinances.RemovePlaidCategoriesResponse")
 }
 
 func init() {
@@ -649,45 +735,50 @@ func init() {
 }
 
 var fileDescriptor_55420273247af5e9 = []byte{
-	// 595 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xac, 0x55, 0xed, 0x8a, 0xd3, 0x40,
-	0x14, 0xdd, 0x74, 0xdd, 0x76, 0xbd, 0xeb, 0x07, 0x0e, 0xd5, 0x86, 0xa0, 0x6e, 0x1b, 0x50, 0xaa,
-	0xd8, 0x74, 0xdd, 0x05, 0x41, 0x04, 0xa1, 0x7e, 0x2d, 0x15, 0x7f, 0x2c, 0x71, 0x8b, 0x20, 0x48,
-	0x99, 0x66, 0xa6, 0xed, 0xd0, 0x74, 0x26, 0x66, 0x26, 0x2b, 0x15, 0xfc, 0xe5, 0x03, 0xf8, 0x3c,
-	0xbe, 0x9d, 0xe4, 0xa3, 0x71, 0x9b, 0x36, 0x4d, 0x77, 0xf5, 0x57, 0x72, 0x67, 0xee, 0x3d, 0xf7,
-	0xcc, 0xe1, 0x9e, 0x19, 0x78, 0x2c, 0xa9, 0x7f, 0xc6, 0x1c, 0x2a, 0xdb, 0x9e, 0x8b, 0x19, 0x19,
-	0x32, 0x8e, 0x79, 0x1a, 0xbd, 0x4b, 0x22, 0xcb, 0xf3, 0x85, 0x12, 0xe8, 0xfa, 0x42, 0x8a, 0x71,
-	0x37, 0x2d, 0x95, 0x63, 0xec, 0x53, 0x92, 0x7c, 0xe2, 0x64, 0xf3, 0x0d, 0xec, 0xbe, 0xc6, 0x8a,
-	0x8e, 0x84, 0x3f, 0x43, 0x37, 0xa0, 0xc4, 0x88, 0xae, 0xd5, 0xb5, 0xe6, 0xb6, 0x5d, 0x62, 0x04,
-	0x21, 0xb8, 0xc2, 0xf1, 0x94, 0xea, 0xa5, 0xba, 0xd6, 0xbc, 0x6a, 0x47, 0xff, 0xa8, 0x0a, 0x3b,
-	0x23, 0x5f, 0x04, 0x9e, 0xbe, 0x1d, 0x2d, 0xc6, 0x81, 0xf9, 0x4b, 0x83, 0xfd, 0x0f, 0x8c, 0x4f,
-	0x62, 0x26, 0x0c, 0xbb, 0x5d, 0x2e, 0x15, 0x53, 0x81, 0x62, 0x82, 0xdb, 0xf4, 0x6b, 0x40, 0xa5,
-	0x42, 0x35, 0xa8, 0x04, 0x92, 0xfa, 0xfd, 0xb4, 0x45, 0x39, 0x0c, 0xbb, 0x04, 0x35, 0xe0, 0x9a,
-	0x17, 0x0c, 0x5c, 0xe6, 0xf4, 0x95, 0x98, 0x50, 0x9e, 0xb4, 0xdb, 0x8b, 0xd7, 0x4e, 0xc3, 0x25,
-	0x74, 0x00, 0xd5, 0xe8, 0x50, 0x7d, 0xf6, 0x17, 0x37, 0x04, 0x8a, 0x49, 0xa0, 0x68, 0xef, 0x5c,
-	0xcb, 0x2e, 0x31, 0x27, 0x50, 0xcf, 0x27, 0x24, 0x3d, 0xc1, 0x25, 0x45, 0xc7, 0x80, 0x86, 0xf3,
-	0xfd, 0x3e, 0x76, 0x1c, 0x11, 0x70, 0x25, 0x75, 0xad, 0xbe, 0xdd, 0xdc, 0x3b, 0xd4, 0xad, 0x44,
-	0xa6, 0x14, 0xa1, 0x13, 0x27, 0xd8, 0xb7, 0x86, 0x99, 0x15, 0x69, 0xf6, 0xa0, 0xd1, 0xf3, 0x08,
-	0x56, 0xf4, 0x52, 0xe7, 0xaf, 0x41, 0x85, 0x29, 0x3a, 0x0d, 0x37, 0x4a, 0xf1, 0x46, 0x18, 0x76,
-	0x89, 0xf9, 0x12, 0xcc, 0x75, 0xb0, 0xc9, 0x29, 0x74, 0xa8, 0xc8, 0xc0, 0x71, 0xa8, 0x94, 0x11,
-	0xee, 0xae, 0x3d, 0x0f, 0x4d, 0x1b, 0xee, 0x67, 0xea, 0xe7, 0x8c, 0x2f, 0xcf, 0xe9, 0x05, 0xec,
-	0xe7, 0x62, 0x16, 0x12, 0xea, 0x41, 0xc3, 0xa6, 0x53, 0x71, 0xf6, 0xff, 0x75, 0x5a, 0x07, 0x5b,
-	0x48, 0xeb, 0x3d, 0xdc, 0xe9, 0x10, 0x72, 0xea, 0x63, 0x2e, 0xb1, 0x13, 0xd6, 0xfc, 0x83, 0x3e,
-	0x47, 0x50, 0x5b, 0xc2, 0x2a, 0x24, 0x50, 0x81, 0x9d, 0xb7, 0x53, 0x4f, 0xcd, 0xcc, 0x67, 0x60,
-	0x74, 0x08, 0x39, 0x09, 0xc7, 0x39, 0x71, 0x25, 0xa3, 0x9b, 0x00, 0x3c, 0x87, 0x7b, 0xb1, 0x02,
-	0x17, 0x2e, 0x3d, 0xfc, 0x5d, 0x86, 0xea, 0xc9, 0xf9, 0x5b, 0xe4, 0x63, 0x7c, 0x5d, 0xa0, 0x1f,
-	0xa0, 0xe7, 0x39, 0x08, 0x59, 0xd6, 0xc2, 0x1d, 0x63, 0x15, 0x78, 0xdf, 0x68, 0x6f, 0x9c, 0x1f,
-	0xf3, 0x35, 0xb7, 0xd0, 0x4f, 0x0d, 0x8c, 0xfc, 0xe9, 0x47, 0x07, 0x19, 0xc4, 0x42, 0xff, 0x19,
-	0x4f, 0x2f, 0x50, 0x91, 0xb2, 0xf8, 0x0e, 0xb5, 0x9c, 0x71, 0x47, 0xad, 0xf5, 0x78, 0x19, 0xab,
-	0x19, 0xd6, 0xa6, 0xe9, 0x0b, 0x0a, 0xe4, 0xcf, 0xf5, 0x92, 0x02, 0x85, 0xce, 0x5a, 0x52, 0xa0,
-	0xd8, 0x34, 0xe6, 0x16, 0x1a, 0xc0, 0xcd, 0xcc, 0x40, 0xa3, 0x07, 0x19, 0x9c, 0xd5, 0xe6, 0x31,
-	0x1e, 0x16, 0xa5, 0xa5, 0x3d, 0x3e, 0x01, 0x5a, 0x1e, 0x7b, 0x54, 0xcd, 0xd4, 0x47, 0x16, 0x31,
-	0x1e, 0x2d, 0xa3, 0xe6, 0x0c, 0xbd, 0xb9, 0x85, 0xbe, 0xc0, 0xed, 0x95, 0xbe, 0xc8, 0xc1, 0x7e,
-	0xb2, 0x52, 0xa0, 0x5c, 0xf8, 0x57, 0xdd, 0xcf, 0xc7, 0x23, 0xa6, 0xc6, 0xc1, 0xc0, 0x72, 0xc4,
-	0xb4, 0xcd, 0x29, 0x75, 0x9d, 0xb1, 0x08, 0xc8, 0x18, 0xfb, 0xb3, 0xf6, 0x20, 0x20, 0x23, 0xaa,
-	0xbe, 0x61, 0xd7, 0xa5, 0xaa, 0x85, 0x3d, 0xd6, 0x0a, 0x9f, 0x61, 0xea, 0xb7, 0x57, 0x3f, 0xe4,
-	0x83, 0x72, 0xf4, 0x1c, 0x1f, 0xfd, 0x09, 0x00, 0x00, 0xff, 0xff, 0xbd, 0xc8, 0x9f, 0x77, 0xe9,
-	0x07, 0x00, 0x00,
+	// 676 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xc4, 0x56, 0x4b, 0x6f, 0xd3, 0x4c,
+	0x14, 0x8d, 0xe3, 0xaf, 0x4d, 0x7b, 0xfb, 0xb5, 0x15, 0x43, 0x50, 0xad, 0x80, 0xa8, 0x3b, 0x1b,
+	0x42, 0xa5, 0x3a, 0xa5, 0x6c, 0x40, 0x48, 0x48, 0xe5, 0x55, 0x2c, 0x75, 0x81, 0x4c, 0xcb, 0x82,
+	0x4d, 0x34, 0xf1, 0x4c, 0x93, 0x51, 0x1d, 0x8f, 0xf1, 0x8c, 0x5b, 0x15, 0xa9, 0x0b, 0xc4, 0x0f,
+	0x60, 0x0f, 0x5b, 0x7e, 0x28, 0xf2, 0xa3, 0x6e, 0xe2, 0xd4, 0x71, 0x1a, 0x21, 0xb1, 0x4a, 0xee,
+	0xeb, 0xcc, 0xb9, 0xd7, 0x77, 0x8e, 0x06, 0xb6, 0x25, 0x0b, 0xcf, 0xb8, 0xcb, 0x64, 0x27, 0xf0,
+	0x08, 0xa7, 0x27, 0xdc, 0x27, 0x7e, 0x6e, 0xbd, 0xcb, 0x2c, 0x2b, 0x08, 0x85, 0x12, 0x68, 0x75,
+	0x2c, 0xa5, 0xf5, 0x20, 0x2f, 0x95, 0x03, 0x12, 0x32, 0x9a, 0xfd, 0xa4, 0xc9, 0xf8, 0x0d, 0x2c,
+	0xbd, 0x26, 0x8a, 0xf5, 0x45, 0x78, 0x81, 0xd6, 0xa0, 0xce, 0xa9, 0xa1, 0x99, 0x5a, 0x5b, 0x77,
+	0xea, 0x9c, 0x22, 0x04, 0xff, 0xf9, 0x64, 0xc8, 0x8c, 0xba, 0xa9, 0xb5, 0x97, 0x9d, 0xe4, 0x3f,
+	0x6a, 0xc2, 0x42, 0x3f, 0x14, 0x51, 0x60, 0xe8, 0x89, 0x33, 0x35, 0xf0, 0x0f, 0x0d, 0x36, 0x0f,
+	0xb9, 0x7f, 0x9a, 0x32, 0xe1, 0xc4, 0xb3, 0x7d, 0xa9, 0xb8, 0x8a, 0x14, 0x17, 0xbe, 0xc3, 0xbe,
+	0x44, 0x4c, 0x2a, 0xb4, 0x01, 0x8d, 0x48, 0xb2, 0xb0, 0x9b, 0x1f, 0xb1, 0x18, 0x9b, 0x36, 0x45,
+	0x5b, 0xf0, 0x7f, 0x10, 0xf5, 0x3c, 0xee, 0x76, 0x95, 0x38, 0x65, 0x7e, 0x76, 0xdc, 0x4a, 0xea,
+	0x3b, 0x8a, 0x5d, 0x68, 0x17, 0x9a, 0x49, 0x53, 0x5d, 0x7e, 0x8d, 0x1b, 0x03, 0xa5, 0x24, 0x50,
+	0x12, 0x1b, 0x39, 0xd2, 0xa6, 0xf8, 0x14, 0xcc, 0x72, 0x42, 0x32, 0x10, 0xbe, 0x64, 0xe8, 0x00,
+	0xd0, 0xc9, 0x55, 0xbc, 0x4b, 0x5c, 0x57, 0x44, 0xbe, 0x92, 0x86, 0x66, 0xea, 0xed, 0x95, 0x3d,
+	0xc3, 0xca, 0xc6, 0x94, 0x23, 0xec, 0xa7, 0x09, 0xce, 0x9d, 0x93, 0x82, 0x47, 0xe2, 0x63, 0xd8,
+	0x3a, 0x0e, 0x28, 0x51, 0x6c, 0xae, 0xfe, 0x37, 0xa0, 0xc1, 0x15, 0x1b, 0xc6, 0x81, 0x7a, 0x1a,
+	0x88, 0x4d, 0x9b, 0xe2, 0x97, 0x80, 0xa7, 0xc1, 0x66, 0x5d, 0x18, 0xd0, 0x90, 0x91, 0xeb, 0x32,
+	0x29, 0x13, 0xdc, 0x25, 0xe7, 0xca, 0xc4, 0x0e, 0x3c, 0x2c, 0xd4, 0x5f, 0x31, 0x9e, 0x9f, 0xd3,
+	0x0b, 0xd8, 0x2c, 0xc5, 0xac, 0x24, 0x74, 0x0c, 0x5b, 0x0e, 0x1b, 0x8a, 0xb3, 0xbf, 0x3f, 0xa7,
+	0x69, 0xb0, 0x95, 0xb4, 0xbe, 0x69, 0xf0, 0x78, 0x9f, 0xd2, 0xf7, 0x5c, 0x2a, 0x11, 0x72, 0x97,
+	0x78, 0x39, 0xce, 0x51, 0x48, 0x7c, 0x49, 0xdc, 0x18, 0x67, 0xfe, 0x99, 0x21, 0x0c, 0xab, 0xd9,
+	0xf6, 0x66, 0x61, 0x3d, 0xdb, 0xf0, 0x64, 0x6d, 0xd3, 0x1e, 0x3e, 0xc1, 0xf6, 0x2c, 0x14, 0xb2,
+	0x5e, 0xda, 0xb0, 0xee, 0xb3, 0xf3, 0xd1, 0x50, 0xc6, 0xa5, 0xe8, 0xc6, 0xe7, 0xb0, 0xb9, 0x4f,
+	0xe9, 0x3f, 0x68, 0xe8, 0x10, 0xcc, 0xf2, 0x83, 0x6f, 0xdd, 0xc6, 0x4f, 0x6d, 0xe2, 0x1b, 0xdf,
+	0xaa, 0x95, 0x47, 0xb0, 0xae, 0xae, 0xf3, 0xbb, 0x9c, 0x4a, 0xa3, 0x6e, 0xea, 0x6d, 0xdd, 0x59,
+	0x1b, 0x71, 0xdb, 0x54, 0xa2, 0x3d, 0xb8, 0x97, 0xb6, 0x56, 0x4c, 0xd7, 0x4d, 0xbd, 0xbd, 0xec,
+	0xdc, 0x4d, 0x82, 0x47, 0x63, 0x35, 0xb8, 0x01, 0x0b, 0x6f, 0x87, 0x81, 0xba, 0xd8, 0xfb, 0xdd,
+	0x80, 0xe6, 0x87, 0x51, 0x45, 0xfe, 0x98, 0x4a, 0x2f, 0xba, 0x04, 0xa3, 0x4c, 0x8d, 0x90, 0x65,
+	0x8d, 0xe9, 0xb5, 0x55, 0xa1, 0xa3, 0xad, 0xce, 0xcc, 0xf9, 0xe9, 0x94, 0x71, 0x0d, 0x7d, 0xd7,
+	0xa0, 0x55, 0xae, 0x24, 0x68, 0xb7, 0x80, 0x58, 0xa9, 0x65, 0xad, 0x27, 0xb7, 0xa8, 0xc8, 0x59,
+	0x7c, 0x85, 0x8d, 0x12, 0xe9, 0x40, 0x3b, 0xd3, 0xf1, 0x0a, 0xb2, 0xd5, 0xb2, 0x66, 0x4d, 0x1f,
+	0x9b, 0x40, 0xb9, 0x46, 0x4c, 0x4c, 0xa0, 0x52, 0xa5, 0x26, 0x26, 0x50, 0x2d, 0x40, 0xb8, 0x86,
+	0x7e, 0x69, 0x80, 0xab, 0x6f, 0x39, 0x7a, 0x56, 0xc0, 0x9e, 0x59, 0x9b, 0x5a, 0xcf, 0xe7, 0xa8,
+	0xcc, 0xd9, 0x5d, 0x82, 0x51, 0x76, 0x63, 0x27, 0x96, 0xb4, 0x42, 0x53, 0x26, 0x96, 0xb4, 0x4a,
+	0x0a, 0x70, 0x0d, 0x0d, 0xe0, 0xfe, 0x94, 0x1b, 0x8e, 0x2a, 0x06, 0x7e, 0x13, 0x89, 0x66, 0xa1,
+	0x24, 0xb9, 0xa4, 0xb8, 0xf6, 0xca, 0xfe, 0x7c, 0xd0, 0xe7, 0x6a, 0x10, 0xf5, 0x2c, 0x57, 0x0c,
+	0x3b, 0x3e, 0x63, 0x9e, 0x3b, 0x10, 0x11, 0x1d, 0x90, 0xf0, 0xa2, 0xd3, 0x8b, 0x68, 0x9f, 0xa9,
+	0x73, 0xe2, 0x79, 0x4c, 0xed, 0x90, 0x80, 0xef, 0xc4, 0xaf, 0x27, 0x16, 0x76, 0x6e, 0x7e, 0x7f,
+	0xf5, 0x16, 0x93, 0x57, 0xd4, 0xd3, 0x3f, 0x01, 0x00, 0x00, 0xff, 0xff, 0xc2, 0x28, 0x1d, 0x69,
+	0xa0, 0x09, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -706,9 +797,9 @@ type PlaidFinancesServiceClient interface {
 	UpdateFinancialInstitution(ctx context.Context, in *UpdateFinancialInstitutionRequest, opts ...grpc.CallOption) (*UpdateFinancialInstitutionResponse, error)
 	UpdateFinancialAccounts(ctx context.Context, in *UpdateFinancialAccountsRequest, opts ...grpc.CallOption) (*UpdateFinancialAccountsResponse, error)
 	RemoveFinancialInstitution(ctx context.Context, in *RemoveFinancialInstitutionRequest, opts ...grpc.CallOption) (*RemoveFinancialInstitutionResponse, error)
-	AddTransactions(ctx context.Context, in *AddTransactionsRequest, opts ...grpc.CallOption) (*AddTransactionsResponse, error)
-	AddPlaidCategories(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*AddPlaidCategoriesResponse, error)
-	RemovePlaidCategories(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*RemovePlaidCategoriesResponse, error)
+	AddHistoricalFinancialTransactions(ctx context.Context, in *AddHistoricalFinancialTransactionsRequest, opts ...grpc.CallOption) (*AddHistoricalFinancialTransactionsResponse, error)
+	AddFinancialTransactions(ctx context.Context, in *AddFinancialTransactionsRequest, opts ...grpc.CallOption) (*AddFinancialTransactionsResponse, error)
+	RemoveFinancialTransactions(ctx context.Context, in *RemoveFinancialTransactionsRequest, opts ...grpc.CallOption) (*Empty, error)
 }
 
 type plaidFinancesServiceClient struct {
@@ -755,27 +846,27 @@ func (c *plaidFinancesServiceClient) RemoveFinancialInstitution(ctx context.Cont
 	return out, nil
 }
 
-func (c *plaidFinancesServiceClient) AddTransactions(ctx context.Context, in *AddTransactionsRequest, opts ...grpc.CallOption) (*AddTransactionsResponse, error) {
-	out := new(AddTransactionsResponse)
-	err := c.cc.Invoke(ctx, "/plaidfinances.PlaidFinancesService/AddTransactions", in, out, opts...)
+func (c *plaidFinancesServiceClient) AddHistoricalFinancialTransactions(ctx context.Context, in *AddHistoricalFinancialTransactionsRequest, opts ...grpc.CallOption) (*AddHistoricalFinancialTransactionsResponse, error) {
+	out := new(AddHistoricalFinancialTransactionsResponse)
+	err := c.cc.Invoke(ctx, "/plaidfinances.PlaidFinancesService/AddHistoricalFinancialTransactions", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *plaidFinancesServiceClient) AddPlaidCategories(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*AddPlaidCategoriesResponse, error) {
-	out := new(AddPlaidCategoriesResponse)
-	err := c.cc.Invoke(ctx, "/plaidfinances.PlaidFinancesService/AddPlaidCategories", in, out, opts...)
+func (c *plaidFinancesServiceClient) AddFinancialTransactions(ctx context.Context, in *AddFinancialTransactionsRequest, opts ...grpc.CallOption) (*AddFinancialTransactionsResponse, error) {
+	out := new(AddFinancialTransactionsResponse)
+	err := c.cc.Invoke(ctx, "/plaidfinances.PlaidFinancesService/AddFinancialTransactions", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *plaidFinancesServiceClient) RemovePlaidCategories(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*RemovePlaidCategoriesResponse, error) {
-	out := new(RemovePlaidCategoriesResponse)
-	err := c.cc.Invoke(ctx, "/plaidfinances.PlaidFinancesService/RemovePlaidCategories", in, out, opts...)
+func (c *plaidFinancesServiceClient) RemoveFinancialTransactions(ctx context.Context, in *RemoveFinancialTransactionsRequest, opts ...grpc.CallOption) (*Empty, error) {
+	out := new(Empty)
+	err := c.cc.Invoke(ctx, "/plaidfinances.PlaidFinancesService/RemoveFinancialTransactions", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -788,9 +879,9 @@ type PlaidFinancesServiceServer interface {
 	UpdateFinancialInstitution(context.Context, *UpdateFinancialInstitutionRequest) (*UpdateFinancialInstitutionResponse, error)
 	UpdateFinancialAccounts(context.Context, *UpdateFinancialAccountsRequest) (*UpdateFinancialAccountsResponse, error)
 	RemoveFinancialInstitution(context.Context, *RemoveFinancialInstitutionRequest) (*RemoveFinancialInstitutionResponse, error)
-	AddTransactions(context.Context, *AddTransactionsRequest) (*AddTransactionsResponse, error)
-	AddPlaidCategories(context.Context, *Empty) (*AddPlaidCategoriesResponse, error)
-	RemovePlaidCategories(context.Context, *Empty) (*RemovePlaidCategoriesResponse, error)
+	AddHistoricalFinancialTransactions(context.Context, *AddHistoricalFinancialTransactionsRequest) (*AddHistoricalFinancialTransactionsResponse, error)
+	AddFinancialTransactions(context.Context, *AddFinancialTransactionsRequest) (*AddFinancialTransactionsResponse, error)
+	RemoveFinancialTransactions(context.Context, *RemoveFinancialTransactionsRequest) (*Empty, error)
 }
 
 // UnimplementedPlaidFinancesServiceServer can be embedded to have forward compatible implementations.
@@ -809,14 +900,14 @@ func (*UnimplementedPlaidFinancesServiceServer) UpdateFinancialAccounts(ctx cont
 func (*UnimplementedPlaidFinancesServiceServer) RemoveFinancialInstitution(ctx context.Context, req *RemoveFinancialInstitutionRequest) (*RemoveFinancialInstitutionResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method RemoveFinancialInstitution not implemented")
 }
-func (*UnimplementedPlaidFinancesServiceServer) AddTransactions(ctx context.Context, req *AddTransactionsRequest) (*AddTransactionsResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method AddTransactions not implemented")
+func (*UnimplementedPlaidFinancesServiceServer) AddHistoricalFinancialTransactions(ctx context.Context, req *AddHistoricalFinancialTransactionsRequest) (*AddHistoricalFinancialTransactionsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AddHistoricalFinancialTransactions not implemented")
 }
-func (*UnimplementedPlaidFinancesServiceServer) AddPlaidCategories(ctx context.Context, req *Empty) (*AddPlaidCategoriesResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method AddPlaidCategories not implemented")
+func (*UnimplementedPlaidFinancesServiceServer) AddFinancialTransactions(ctx context.Context, req *AddFinancialTransactionsRequest) (*AddFinancialTransactionsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AddFinancialTransactions not implemented")
 }
-func (*UnimplementedPlaidFinancesServiceServer) RemovePlaidCategories(ctx context.Context, req *Empty) (*RemovePlaidCategoriesResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method RemovePlaidCategories not implemented")
+func (*UnimplementedPlaidFinancesServiceServer) RemoveFinancialTransactions(ctx context.Context, req *RemoveFinancialTransactionsRequest) (*Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RemoveFinancialTransactions not implemented")
 }
 
 func RegisterPlaidFinancesServiceServer(s *grpc.Server, srv PlaidFinancesServiceServer) {
@@ -895,56 +986,56 @@ func _PlaidFinancesService_RemoveFinancialInstitution_Handler(srv interface{}, c
 	return interceptor(ctx, in, info, handler)
 }
 
-func _PlaidFinancesService_AddTransactions_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(AddTransactionsRequest)
+func _PlaidFinancesService_AddHistoricalFinancialTransactions_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AddHistoricalFinancialTransactionsRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(PlaidFinancesServiceServer).AddTransactions(ctx, in)
+		return srv.(PlaidFinancesServiceServer).AddHistoricalFinancialTransactions(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/plaidfinances.PlaidFinancesService/AddTransactions",
+		FullMethod: "/plaidfinances.PlaidFinancesService/AddHistoricalFinancialTransactions",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PlaidFinancesServiceServer).AddTransactions(ctx, req.(*AddTransactionsRequest))
+		return srv.(PlaidFinancesServiceServer).AddHistoricalFinancialTransactions(ctx, req.(*AddHistoricalFinancialTransactionsRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _PlaidFinancesService_AddPlaidCategories_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(Empty)
+func _PlaidFinancesService_AddFinancialTransactions_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AddFinancialTransactionsRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(PlaidFinancesServiceServer).AddPlaidCategories(ctx, in)
+		return srv.(PlaidFinancesServiceServer).AddFinancialTransactions(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/plaidfinances.PlaidFinancesService/AddPlaidCategories",
+		FullMethod: "/plaidfinances.PlaidFinancesService/AddFinancialTransactions",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PlaidFinancesServiceServer).AddPlaidCategories(ctx, req.(*Empty))
+		return srv.(PlaidFinancesServiceServer).AddFinancialTransactions(ctx, req.(*AddFinancialTransactionsRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _PlaidFinancesService_RemovePlaidCategories_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(Empty)
+func _PlaidFinancesService_RemoveFinancialTransactions_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RemoveFinancialTransactionsRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(PlaidFinancesServiceServer).RemovePlaidCategories(ctx, in)
+		return srv.(PlaidFinancesServiceServer).RemoveFinancialTransactions(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/plaidfinances.PlaidFinancesService/RemovePlaidCategories",
+		FullMethod: "/plaidfinances.PlaidFinancesService/RemoveFinancialTransactions",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PlaidFinancesServiceServer).RemovePlaidCategories(ctx, req.(*Empty))
+		return srv.(PlaidFinancesServiceServer).RemoveFinancialTransactions(ctx, req.(*RemoveFinancialTransactionsRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -970,16 +1061,16 @@ var _PlaidFinancesService_serviceDesc = grpc.ServiceDesc{
 			Handler:    _PlaidFinancesService_RemoveFinancialInstitution_Handler,
 		},
 		{
-			MethodName: "AddTransactions",
-			Handler:    _PlaidFinancesService_AddTransactions_Handler,
+			MethodName: "AddHistoricalFinancialTransactions",
+			Handler:    _PlaidFinancesService_AddHistoricalFinancialTransactions_Handler,
 		},
 		{
-			MethodName: "AddPlaidCategories",
-			Handler:    _PlaidFinancesService_AddPlaidCategories_Handler,
+			MethodName: "AddFinancialTransactions",
+			Handler:    _PlaidFinancesService_AddFinancialTransactions_Handler,
 		},
 		{
-			MethodName: "RemovePlaidCategories",
-			Handler:    _PlaidFinancesService_RemovePlaidCategories_Handler,
+			MethodName: "RemoveFinancialTransactions",
+			Handler:    _PlaidFinancesService_RemoveFinancialTransactions_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

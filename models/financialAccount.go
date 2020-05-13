@@ -1,6 +1,8 @@
 package models
 
 import (
+	"database/sql"
+
 	"github.com/plaid/plaid-go/plaid"
 )
 
@@ -61,12 +63,12 @@ func (a *FinancialAccount) GetAccountID() int64 {
 
 // FinancialAccountRepository interface
 type FinancialAccountRepository interface {
-	AddAccount(account *FinancialAccount) error
-	UpdateAccount(userID int64, accountID int64, account *FinancialAccount) error
-	GetAccountByID(userID int64, accountID int64) (*FinancialAccount, error)
-	GetAccountByPlaidID(userID int64, plaidAccountID string) (*FinancialAccount, error)
-	GetItemAccounts(userID int64, itemID int64) ([]FinancialAccount, error)
-	GetUserAccounts(userID int64) ([]FinancialAccount, error)
-	RemoveItemAccounts(userID int64, itemID int64) error
-	RemoveUserAccounts(userID int64) error
+	AddAccount(tx *sql.Tx, account *FinancialAccount) error
+	UpdateAccount(tx *sql.Tx, userID int64, accountID int64, account *FinancialAccount) error
+	GetAccountByID(tx *sql.Tx, userID int64, accountID int64) (*FinancialAccount, error)
+	GetAccountByPlaidID(tx *sql.Tx, userID int64, plaidAccountID string) (*FinancialAccount, error)
+	GetItemAccounts(tx *sql.Tx, userID int64, itemID int64) ([]FinancialAccount, error)
+	GetUserAccounts(tx *sql.Tx, userID int64) ([]FinancialAccount, error)
+	RemoveItemAccounts(tx *sql.Tx, userID int64, itemID int64) error
+	RemoveUserAccounts(tx *sql.Tx, userID int64) error
 }

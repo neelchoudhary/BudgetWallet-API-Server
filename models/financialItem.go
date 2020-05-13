@@ -1,7 +1,9 @@
 package models
 
 import (
+	"database/sql"
 	"errors"
+	"time"
 
 	"github.com/plaid/plaid-go/plaid"
 )
@@ -53,7 +55,7 @@ func NewFinancialItemFromPlaid(userID int64, publicToken string, institutionPlai
 // GetFinancialAccountsFromPlaid ...
 func (i *FinancialItem) GetFinancialAccountsFromPlaid(userID int64, plaidClient *plaid.Client) ([]FinancialAccount, error) {
 	// Get all new plaid accounts from this item
-	accountsResponse, err := plaidClient.GetAccounts(i.GetAccessToken())
+	accountsResponse, err := plaidClient.GetAccounts(i.PlaidAccessToken)
 	if err != nil {
 		return nil, err
 	}
@@ -62,16 +64,66 @@ func (i *FinancialItem) GetFinancialAccountsFromPlaid(userID int64, plaidClient 
 	plaidAccounts := accountsResponse.Accounts
 	accounts := make([]FinancialAccount, 0)
 	for _, plaidAccount := range plaidAccounts {
-		account := NewFinancialAccountFromPlaid(userID, i.GetItemID(), plaidAccount)
+		account := NewFinancialAccountFromPlaid(userID, i.ID, plaidAccount)
 		accounts = append(accounts, account)
 	}
 
 	return accounts, nil
 }
 
+// GetFinancialTransactionsFromPlaid ...
+func (i *FinancialItem) GetFinancialTransactionsFromPlaid(startDate string, plaidClient *plaid.Client) ([]FinancialTransaction, error) {
+	paginate := 0
+	shouldLoop := true
+	transactions := make([]FinancialTransaction, 0)
+	for shouldLoop {
+		var err error
+		shouldLoop, err = i.getFinancialTransactionsFromPlaidWithPagination(paginate, startDate, &transactions, plaidClient)
+		if err != nil {
+			return nil, err
+		}
+		// Delay to avoid rate limits
+		if shouldLoop {
+			paginate += 500
+			time.Sleep(100 * time.Millisecond)
+		}
+	}
+	return transactions, nil
+}
+
+// GetFinancialTransactionsFromPlaid ...
+func (i *FinancialItem) getFinancialTransactionsFromPlaidWithPagination(offset int, startDate string, transactions *[]FinancialTransaction, plaidClient *plaid.Client) (bool, error) {
+	// Get transactions from Plaid (500 max at a time) with offset pagination
+	res, err := plaidClient.GetTransactionsWithOptions(i.PlaidAccessToken, plaid.GetTransactionsOptions{
+		EndDate:   time.Now().Local().Format("2006-01-02"),
+		StartDate: startDate,
+		Count:     500,
+		Offset:    offset,
+	})
+
+	if err != nil {
+		return false, err
+	}
+
+	// Convert plaid transactions to financial transactions
+	for _, plaidTransaction := range res.Transactions {
+		// ! need to provide proper account & category id
+		transaction := NewFinancialTransactionFromPlaid(i.UserID, i.ID, plaidTransaction)
+		*transactions = append(*transactions, transaction)
+	}
+
+	// If there are less than 500 transactions, we have reached the end
+	if len(res.Transactions) < 500 {
+		return false, nil
+	}
+
+	// Otherwise, continue looping
+	return true, nil
+}
+
 // UpdateItemFromPlaid update item from plaid in the DB
 func (i *FinancialItem) UpdateItemFromPlaid(plaidClient *plaid.Client) error {
-	itemResponse, err := plaidClient.GetItem(i.GetAccessToken())
+	itemResponse, err := plaidClient.GetItem(i.PlaidAccessToken)
 	if err != nil {
 		return err
 	}
@@ -95,7 +147,7 @@ func (i *FinancialItem) UpdateItemFromPlaid(plaidClient *plaid.Client) error {
 
 // RemoveItemFromPlaid calls Plaid api to remove item
 func (i *FinancialItem) RemoveItemFromPlaid(plaidClient *plaid.Client) error {
-	res, err := plaidClient.RemoveItem(i.GetAccessToken())
+	res, err := plaidClient.RemoveItem(i.PlaidAccessToken)
 	if err != nil {
 		return err
 	}
@@ -105,23 +157,13 @@ func (i *FinancialItem) RemoveItemFromPlaid(plaidClient *plaid.Client) error {
 	return nil
 }
 
-// GetAccessToken get the access token field
-func (i *FinancialItem) GetAccessToken() string {
-	return i.PlaidAccessToken
-}
-
-// GetItemID get the item's ID field
-func (i *FinancialItem) GetItemID() int64 {
-	return i.ID
-}
-
 // FinancialItemRepository interface
 type FinancialItemRepository interface {
-	AddItem(item *FinancialItem) error
-	UpdateItem(userID int64, itemID int64, item *FinancialItem) error
-	GetItemByID(userID int64, itemID int64) (*FinancialItem, error)
-	GetItemByPlaidID(userID int64, plaidItemID string) (*FinancialItem, error)
-	GetUserItems(userID int64) ([]FinancialItem, error)
-	RemoveItem(userID int64, itemID int64) error
-	RemoveUserItems(userID int64) error
+	AddItem(tx *sql.Tx, item *FinancialItem) error
+	UpdateItem(tx *sql.Tx, userID int64, itemID int64, item *FinancialItem) error
+	GetItemByID(tx *sql.Tx, userID int64, itemID int64) (*FinancialItem, error)
+	GetItemByPlaidID(tx *sql.Tx, userID int64, plaidItemID string) (*FinancialItem, error)
+	GetUserItems(tx *sql.Tx, userID int64) ([]FinancialItem, error)
+	RemoveItem(tx *sql.Tx, userID int64, itemID int64) error
+	RemoveUserItems(tx *sql.Tx, userID int64) error
 }

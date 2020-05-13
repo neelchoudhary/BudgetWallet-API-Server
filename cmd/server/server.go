@@ -4,9 +4,9 @@ import (
 	"context"
 	"log"
 	"net"
-	"net/http"
 
-	"github.com/gorilla/mux"
+	"github.com/neelchoudhary/budgetwallet-api-server/services/financialcategories"
+
 	"github.com/neelchoudhary/budgetwallet-api-server/config"
 	"github.com/neelchoudhary/budgetwallet-api-server/services/auth"
 	"github.com/neelchoudhary/budgetwallet-api-server/services/plaidfinances"
@@ -16,13 +16,14 @@ import (
 	"google.golang.org/grpc/credentials"
 )
 
-// Server holds the dependencies for a HTTP server.
+// Server holds the dependencies for a gRPC server.
 type Server struct {
-	serverConfig         *config.ServerConfig
-	jwtManager           *utils.JWTManager
-	authService          *auth.AuthServiceServer
-	userFinancesService  *userfinances.UserFinancesServiceServer
-	plaidFinancesService *plaidfinances.PlaidFinancesServiceServer
+	serverConfig               *config.ServerConfig
+	jwtManager                 *utils.JWTManager
+	authService                *auth.AuthServiceServer
+	userFinancesService        *userfinances.UserFinancesServiceServer
+	plaidFinancesService       *plaidfinances.PlaidFinancesServiceServer
+	financialCategoriesService *financialcategories.FinancialCategoryServiceServer
 }
 
 // NewServer construct a new server with service dependencies
@@ -30,13 +31,15 @@ func NewServer(serverConfig *config.ServerConfig,
 	jwtManager *utils.JWTManager,
 	authService *auth.AuthServiceServer,
 	userFinancesService *userfinances.UserFinancesServiceServer,
-	plaidFinancesService *plaidfinances.PlaidFinancesServiceServer) *Server {
+	plaidFinancesService *plaidfinances.PlaidFinancesServiceServer,
+	financialCategoriesService *financialcategories.FinancialCategoryServiceServer) *Server {
 	return &Server{
-		serverConfig:         serverConfig,
-		jwtManager:           jwtManager,
-		authService:          authService,
-		userFinancesService:  userFinancesService,
-		plaidFinancesService: plaidFinancesService,
+		serverConfig:               serverConfig,
+		jwtManager:                 jwtManager,
+		authService:                authService,
+		userFinancesService:        userFinancesService,
+		plaidFinancesService:       plaidFinancesService,
+		financialCategoriesService: financialCategoriesService,
 	}
 }
 
@@ -66,23 +69,11 @@ func (s *Server) runGRPCServer() error {
 	auth.RegisterAuthServiceServer(grpcServer, *s.authService)
 	userfinances.RegisterUserFinancesServiceServer(grpcServer, *s.userFinancesService)
 	plaidfinances.RegisterPlaidFinancesServiceServer(grpcServer, *s.plaidFinancesService)
+	financialcategories.RegisterFinancialCategoryServiceServer(grpcServer, *s.financialCategoriesService)
 
 	// Start gRPC server
 	log.Println("starting gRPC server...")
 	return grpcServer.Serve(listen)
-}
-
-// RunHTTPServer Starts the HTTP server
-func (s *Server) runHTTPServer() error {
-	// Init router
-	r := mux.NewRouter()
-
-	// Webhooks
-	//r.HandleFunc("/webhook/users/{user_id}", controllers.ReceiveWebhooks).Methods("POST")
-
-	// Start server
-	log.Println("starting http server...")
-	return http.ListenAndServe(":"+s.serverConfig.WebhookServerPort, r)
 }
 
 // Authorization unary interceptor function to handle authorize per RPC call
