@@ -6,6 +6,7 @@ import (
 	"github.com/neelchoudhary/budgetwallet-api-server/config"
 	"github.com/neelchoudhary/budgetwallet-api-server/postgresql"
 	"github.com/neelchoudhary/budgetwallet-api-server/services/auth"
+	"github.com/neelchoudhary/budgetwallet-api-server/services/financialcategories"
 	"github.com/neelchoudhary/budgetwallet-api-server/services/plaidfinances"
 	"github.com/neelchoudhary/budgetwallet-api-server/services/userfinances"
 	"github.com/neelchoudhary/budgetwallet-api-server/utils"
@@ -54,14 +55,16 @@ func main() {
 	itemRepo := postgresql.NewFinancialItemRepository(db)
 	accountRepo := postgresql.NewFinancialAccountRepository(db)
 	transactionRepo := postgresql.NewFinancialTransactionRepository(db)
+	categoryRepo := postgresql.NewFinancialCategoryRepository(db)
 
 	// Create Services
 	authService := auth.NewAuthServiceServer(&authRepo, jwtManager)
 	userFinancesService := userfinances.NewUserFinancesServer(&txRepo, &itemRepo, &accountRepo, &transactionRepo)
-	plaidFinancesService := plaidfinances.NewPlaidFinancesServer(&txRepo, &itemRepo, &accountRepo, &transactionRepo, plaidClient)
+	plaidFinancesService := plaidfinances.NewPlaidFinancesServer(&txRepo, &itemRepo, &accountRepo, &transactionRepo, &categoryRepo, plaidClient)
+	financialCategoriesService := financialcategories.NewFinancialCategoriesServer(&txRepo, &categoryRepo, plaidClient)
 
 	// Create Server
-	srv := NewServer(serverConfig, jwtManager, &authService, &userFinancesService, &plaidFinancesService)
+	srv := NewServer(serverConfig, jwtManager, &authService, &userFinancesService, &plaidFinancesService, &financialCategoriesService)
 
 	// Run Server
 	go func() {

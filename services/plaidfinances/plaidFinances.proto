@@ -68,18 +68,6 @@ message AddFinancialTransactionsResponse {
     bool success = 1;
 }
 
-message Empty {
-
-}
-
-message AddPlaidCategoriesResponse {
-    bool success = 1;
-}
-
-message RemovePlaidCategoriesResponse {
-    bool success = 1;
-}
-
 service PlaidFinancesService {
     rpc LinkFinancialInstitution(LinkFinancialInstitutionRequest) returns (LinkFinancialInstitutionResponse) {};
     rpc UpdateFinancialInstitution(UpdateFinancialInstitutionRequest) returns (UpdateFinancialInstitutionResponse) {};
@@ -87,6 +75,4 @@ service PlaidFinancesService {
     rpc RemoveFinancialInstitution(RemoveFinancialInstitutionRequest) returns (RemoveFinancialInstitutionResponse) {};
     rpc AddHistoricalFinancialTransactions(AddHistoricalFinancialTransactionsRequest) returns (AddHistoricalFinancialTransactionsResponse) {};
     rpc AddFinancialTransactions(AddFinancialTransactionsRequest) returns (AddFinancialTransactionsResponse) {};
-    rpc AddPlaidCategories(Empty) returns (AddPlaidCategoriesResponse) {};
-    rpc RemovePlaidCategories(Empty) returns (RemovePlaidCategoriesResponse) {};
 }

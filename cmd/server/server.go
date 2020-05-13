@@ -6,6 +6,8 @@ import (
 	"net"
 	"net/http"
 
+	"github.com/neelchoudhary/budgetwallet-api-server/services/financialcategories"
+
 	"github.com/gorilla/mux"
 	"github.com/neelchoudhary/budgetwallet-api-server/config"
 	"github.com/neelchoudhary/budgetwallet-api-server/services/auth"
@@ -18,11 +20,12 @@ import (
 
 // Server holds the dependencies for a HTTP server.
 type Server struct {
-	serverConfig         *config.ServerConfig
-	jwtManager           *utils.JWTManager
-	authService          *auth.AuthServiceServer
-	userFinancesService  *userfinances.UserFinancesServiceServer
-	plaidFinancesService *plaidfinances.PlaidFinancesServiceServer
+	serverConfig               *config.ServerConfig
+	jwtManager                 *utils.JWTManager
+	authService                *auth.AuthServiceServer
+	userFinancesService        *userfinances.UserFinancesServiceServer
+	plaidFinancesService       *plaidfinances.PlaidFinancesServiceServer
+	financialCategoriesService *financialcategories.FinancialCategoryServiceServer
 }
 
 // NewServer construct a new server with service dependencies
@@ -30,13 +33,15 @@ func NewServer(serverConfig *config.ServerConfig,
 	jwtManager *utils.JWTManager,
 	authService *auth.AuthServiceServer,
 	userFinancesService *userfinances.UserFinancesServiceServer,
-	plaidFinancesService *plaidfinances.PlaidFinancesServiceServer) *Server {
+	plaidFinancesService *plaidfinances.PlaidFinancesServiceServer,
+	financialCategoriesService *financialcategories.FinancialCategoryServiceServer) *Server {
 	return &Server{
-		serverConfig:         serverConfig,
-		jwtManager:           jwtManager,
-		authService:          authService,
-		userFinancesService:  userFinancesService,
-		plaidFinancesService: plaidFinancesService,
+		serverConfig:               serverConfig,
+		jwtManager:                 jwtManager,
+		authService:                authService,
+		userFinancesService:        userFinancesService,
+		plaidFinancesService:       plaidFinancesService,
+		financialCategoriesService: financialCategoriesService,
 	}
 }
 
@@ -66,6 +71,7 @@ func (s *Server) runGRPCServer() error {
 	auth.RegisterAuthServiceServer(grpcServer, *s.authService)
 	userfinances.RegisterUserFinancesServiceServer(grpcServer, *s.userFinancesService)
 	plaidfinances.RegisterPlaidFinancesServiceServer(grpcServer, *s.plaidFinancesService)
+	financialcategories.RegisterFinancialCategoryServiceServer(grpcServer, *s.financialCategoriesService)
 
 	// Start gRPC server
 	log.Println("starting gRPC server...")

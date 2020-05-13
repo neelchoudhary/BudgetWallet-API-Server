@@ -27,12 +27,19 @@ type Service struct {
 	financialItemRepo        models.FinancialItemRepository
 	financialAccountRepo     models.FinancialAccountRepository
 	financialTransactionRepo models.FinancialTransactionRepository
+	financialCategoryRepo    models.FinancialCategoryRepository
 	plaidClient              *plaid.Client
 }
 
 // NewPlaidFinancesServer contructor to assign repo
-func NewPlaidFinancesServer(txRepo *postgresql.TxRepository, itemRepo *models.FinancialItemRepository, accountRepo *models.FinancialAccountRepository, transactionRepo *models.FinancialTransactionRepository, plaidClient *plaid.Client) PlaidFinancesServiceServer {
-	return &Service{txRepo: *txRepo, financialItemRepo: *itemRepo, financialAccountRepo: *accountRepo, financialTransactionRepo: *transactionRepo, plaidClient: plaidClient}
+func NewPlaidFinancesServer(
+	txRepo *postgresql.TxRepository,
+	itemRepo *models.FinancialItemRepository,
+	accountRepo *models.FinancialAccountRepository,
+	transactionRepo *models.FinancialTransactionRepository,
+	financialCategoryRepo *models.FinancialCategoryRepository,
+	plaidClient *plaid.Client) PlaidFinancesServiceServer {
+	return &Service{txRepo: *txRepo, financialItemRepo: *itemRepo, financialAccountRepo: *accountRepo, financialTransactionRepo: *transactionRepo, financialCategoryRepo: *financialCategoryRepo, plaidClient: plaidClient}
 }
 
 // LinkFinancialInstitution link a new financial institution from Plaid and add item and accounts to DB
@@ -236,14 +243,19 @@ func (s *Service) AddHistoricalFinancialTransactions(ctx context.Context, req *A
 	}
 	for _, transaction := range allTransactions {
 		// Set the account id and category id for this transaction
-		// ! todo category id!!
 		account, err := s.financialAccountRepo.GetAccountByPlaidID(tx, req.GetUserId(), transaction.PlaidAccountID)
 		if err != nil {
 			logger("AddHistoricalFinancialTransactions", err).Error(fmt.Sprintf("Repo call to GetAccountByPlaidID failed"))
 			return nil, utils.InternalServerError
 		}
 		transaction.AccountID = account.ID
-		transaction.CategoryID = 1
+
+		categoryID, err := s.financialCategoryRepo.GetFinancialCategoryIDByPlaidID(tx, transaction.PlaidCategoryID)
+		if err != nil {
+			logger("AddHistoricalFinancialTransactions", err).Error(fmt.Sprintf("Repo call to GetFinancialCategoryIDByPlaidID failed"))
+			return nil, utils.InternalServerError
+		}
+		transaction.CategoryID = categoryID
 
 		// Add transaction to db
 		s.financialTransactionRepo.AddTransaction(tx, &transaction)
@@ -305,12 +317,17 @@ func (s *Service) AddFinancialTransactions(ctx context.Context, req *AddFinancia
 			return nil, utils.InternalServerError
 		}
 		transaction.AccountID = account.ID
-		transaction.CategoryID = 2
+
+		categoryID, err := s.financialCategoryRepo.GetFinancialCategoryIDByPlaidID(tx, transaction.PlaidCategoryID)
+		if err != nil {
+			logger("AddFinancialTransactions", err).Error(fmt.Sprintf("Repo call to GetFinancialCategoryIDByPlaidID failed"))
+			return nil, utils.InternalServerError
+		}
+		transaction.CategoryID = categoryID
 
 		s.financialTransactionRepo.AddTransaction(tx, &transaction)
 	}
 
-	// != given transaction count (from req)
 	if int64(len(filteredTransactions)) != req.GetExpectedCount() {
 		logger("AddFinancialTransactions", nil).Warn(fmt.Sprintf("Count mismatch. Expected: %d, Added: %d transactions",
 			req.GetExpectedCount(), len(filteredTransactions)))
@@ -327,16 +344,6 @@ func (s *Service) AddFinancialTransactions(ctx context.Context, req *AddFinancia
 	}
 
 	return res, nil
-}
-
-// AddPlaidCategories add all plaid categories to the DB
-func (s *Service) AddPlaidCategories(context.Context, *Empty) (*AddPlaidCategoriesResponse, error) {
-	return nil, nil
-}
-
-// RemovePlaidCategories remove all plaid categories from the DB
-func (s *Service) RemovePlaidCategories(context.Context, *Empty) (*RemovePlaidCategoriesResponse, error) {
-	return nil, nil
 }
 
 // // RemoveTransactions Get transactions from Plaid given the pagination offset to be added to the db
