@@ -51,22 +51,30 @@ message RemoveFinancialInstitutionResponse {
 message AddHistoricalFinancialTransactionsRequest {
     int64 user_id = 1;
     int64 item_id = 2;
-    int64 expected_count = 3;
+    string plaid_item_id = 3;
 }
 
 message AddHistoricalFinancialTransactionsResponse {
-    bool success = 1;
+    int64 newTransactions = 1;
 }
 
 message AddFinancialTransactionsRequest {
     int64 user_id = 1;
     int64 item_id = 2;
-    int64 expected_count = 3;
+    string plaid_item_id = 3;
 }
 
 message AddFinancialTransactionsResponse {
-    bool success = 1;
+    int64 newTransactions = 1;
 }
+
+message RemoveFinancialTransactionsRequest {
+    int64 user_id = 1;
+    repeated int64 transaction_ids = 2;
+    repeated string plaid_transaction_ids = 3;
+}
+
+message Empty {}
 
 service PlaidFinancesService {
     rpc LinkFinancialInstitution(LinkFinancialInstitutionRequest) returns (LinkFinancialInstitutionResponse) {};
@@ -75,4 +83,5 @@ service PlaidFinancesService {
     rpc RemoveFinancialInstitution(RemoveFinancialInstitutionRequest) returns (RemoveFinancialInstitutionResponse) {};
     rpc AddHistoricalFinancialTransactions(AddHistoricalFinancialTransactionsRequest) returns (AddHistoricalFinancialTransactionsResponse) {};
     rpc AddFinancialTransactions(AddFinancialTransactionsRequest) returns (AddFinancialTransactionsResponse) {};
+    rpc RemoveFinancialTransactions(RemoveFinancialTransactionsRequest) returns (Empty) {};
 }

@@ -4,11 +4,9 @@ import (
 	"context"
 	"log"
 	"net"
-	"net/http"
 
 	"github.com/neelchoudhary/budgetwallet-api-server/services/financialcategories"
 
-	"github.com/gorilla/mux"
 	"github.com/neelchoudhary/budgetwallet-api-server/config"
 	"github.com/neelchoudhary/budgetwallet-api-server/services/auth"
 	"github.com/neelchoudhary/budgetwallet-api-server/services/plaidfinances"
@@ -18,7 +16,7 @@ import (
 	"google.golang.org/grpc/credentials"
 )
 
-// Server holds the dependencies for a HTTP server.
+// Server holds the dependencies for a gRPC server.
 type Server struct {
 	serverConfig               *config.ServerConfig
 	jwtManager                 *utils.JWTManager
@@ -76,19 +74,6 @@ func (s *Server) runGRPCServer() error {
 	// Start gRPC server
 	log.Println("starting gRPC server...")
 	return grpcServer.Serve(listen)
-}
-
-// RunHTTPServer Starts the HTTP server
-func (s *Server) runHTTPServer() error {
-	// Init router
-	r := mux.NewRouter()
-
-	// Webhooks
-	//r.HandleFunc("/webhook/users/{user_id}", controllers.ReceiveWebhooks).Methods("POST")
-
-	// Start server
-	log.Println("starting http server...")
-	return http.ListenAndServe(":"+s.serverConfig.WebhookServerPort, r)
 }
 
 // Authorization unary interceptor function to handle authorize per RPC call

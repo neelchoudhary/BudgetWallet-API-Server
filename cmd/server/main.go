@@ -27,7 +27,6 @@ func main() {
 	serverEnv := flag.String("serverEnv", "local", "Server Environment (local, prd)")
 	serverHost := flag.String("serverHost", "localhost", "Server Host")
 	serverAPIPort := flag.String("serverAPIPort", "50051", "API Server Port")
-	serverWebhookPort := flag.String("serverWebhookPort", "8080", "Webhook Server Port")
 	serverTLSKeyPath := flag.String("serverTLSKeyPath", "", "Server TLS Key Path")
 	serverTLSCertPath := flag.String("serverTLSCertPath", "", "Server TLS Cert Path")
 
@@ -41,7 +40,7 @@ func main() {
 
 	// Create configs from flags
 	dbConfig := config.NewDBConfig(*dbHost, *dbPort, *dbUser, *dbPassword, *dbName)
-	serverConfig := config.NewServerConfig(*serverEnv, *serverHost, *serverAPIPort, *serverWebhookPort, *serverTLSKeyPath, *serverTLSCertPath)
+	serverConfig := config.NewServerConfig(*serverEnv, *serverHost, *serverAPIPort, *serverTLSKeyPath, *serverTLSCertPath)
 	plaidConfig := config.NewPlaidConfig(*plaidClientID, *plaidSecret, *plaidPublicKey)
 	jwtManager := utils.NewJWTManager(*jwtExpiryMin, *jwtSecret)
 
@@ -64,14 +63,8 @@ func main() {
 	financialCategoriesService := financialcategories.NewFinancialCategoriesServer(&txRepo, &categoryRepo, plaidClient)
 
 	// Create Server
-	srv := NewServer(serverConfig, jwtManager, &authService, &userFinancesService, &plaidFinancesService, &financialCategoriesService)
+	apiServer := NewServer(serverConfig, jwtManager, &authService, &userFinancesService, &plaidFinancesService, &financialCategoriesService)
 
-	// Run Server
-	go func() {
-		err := srv.runHTTPServer()
-		utils.LogIfFatalAndExit(err, "Failed to run http server: ")
-	}()
-
-	err := srv.runGRPCServer()
+	err := apiServer.runGRPCServer()
 	utils.LogIfFatalAndExit(err, "Failed to run gRPC server: ")
 }

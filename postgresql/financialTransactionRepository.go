@@ -154,3 +154,9 @@ func (r *financialTransactionRepository) RemoveUserTransactions(tx *sql.Tx, user
 	_, err := tx.Exec("DELETE FROM transactions WHERE user_id=$1;", userID)
 	return err
 }
+
+// RemoveTransactionByID remove a transaction for the given userID and transactionID from the DB
+func (r *financialTransactionRepository) RemoveTransactionByID(tx *sql.Tx, userID int64, transactionID int64) error {
+	_, err := tx.Exec("DELETE FROM transactions WHERE user_id=$1 AND id=$2;", userID, transactionID)
+	return err
+}

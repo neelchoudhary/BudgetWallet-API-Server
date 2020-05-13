@@ -63,4 +63,5 @@ type FinancialTransactionRepository interface {
 	GetUserTransactions(tx *sql.Tx, userID int64) ([]FinancialTransaction, error)
 	RemoveItemTransactions(tx *sql.Tx, userID int64, itemID int64) error
 	RemoveUserTransactions(tx *sql.Tx, userID int64) error
+	RemoveTransactionByID(tx *sql.Tx, userID int64, transactionID int64) error
 }

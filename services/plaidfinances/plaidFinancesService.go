@@ -222,14 +222,22 @@ func (s *Service) AddHistoricalFinancialTransactions(ctx context.Context, req *A
 	}
 
 	// Get item by id
-	item, err := s.financialItemRepo.GetItemByID(tx, req.GetUserId(), req.GetItemId())
-	if err != nil {
-		logger("AddHistoricalFinancialTransactions", err).Error(fmt.Sprintf("Repo call to GetItemByID failed"))
-		return nil, utils.InternalServerError
+	var item *models.FinancialItem
+	if req.GetItemId() != 0 {
+		item, err = s.financialItemRepo.GetItemByID(tx, req.GetUserId(), req.GetItemId())
+		if err != nil {
+			logger("UpdateFinancialInstitution", err).Error(fmt.Sprintf("Repo call to GetItemByID failed"))
+			return nil, utils.InternalServerError
+		}
+	} else {
+		item, err = s.financialItemRepo.GetItemByPlaidID(tx, req.GetUserId(), req.GetPlaidItemId())
+		if err != nil {
+			logger("UpdateFinancialInstitution", err).Error(fmt.Sprintf("Repo call to GetItemByPlaidID failed"))
+			return nil, utils.InternalServerError
+		}
 	}
-
 	// Remove all transactions for this item
-	err = s.financialTransactionRepo.RemoveItemTransactions(tx, req.GetUserId(), req.GetItemId())
+	err = s.financialTransactionRepo.RemoveItemTransactions(tx, req.GetUserId(), item.ID)
 	if err != nil {
 		logger("AddHistoricalFinancialTransactions", err).Error(fmt.Sprintf("Repo call to RemoveItemTransactions failed"))
 		return nil, utils.InternalServerError
@@ -261,12 +269,6 @@ func (s *Service) AddHistoricalFinancialTransactions(ctx context.Context, req *A
 		s.financialTransactionRepo.AddTransaction(tx, &transaction)
 	}
 
-	// If new transaction count differs from expected count, log
-	if int64(len(allTransactions)) != req.GetExpectedCount() {
-		logger("AddHistoricalFinancialTransactions", nil).Warn(fmt.Sprintf("Count mismatch. Expected: %d, Added: %d transactions",
-			req.GetExpectedCount(), len(allTransactions)))
-	}
-
 	// Commit db changes
 	err = s.txRepo.CommitTx(tx)
 	if err != nil {
@@ -276,7 +278,7 @@ func (s *Service) AddHistoricalFinancialTransactions(ctx context.Context, req *A
 
 	// Return response
 	res := &AddHistoricalFinancialTransactionsResponse{
-		Success: true,
+		NewTransactions: int64(len(allTransactions)),
 	}
 
 	return res, nil
@@ -290,10 +292,20 @@ func (s *Service) AddFinancialTransactions(ctx context.Context, req *AddFinancia
 		return nil, utils.InternalServerError
 	}
 
-	item, err := s.financialItemRepo.GetItemByID(tx, req.GetUserId(), req.GetItemId())
-	if err != nil {
-		logger("AddFinancialTransactions", err).Error(fmt.Sprintf("Repo call to GetItemByID failed"))
-		return nil, utils.InternalServerError
+	// Get item by id
+	var item *models.FinancialItem
+	if req.GetItemId() != 0 {
+		item, err = s.financialItemRepo.GetItemByID(tx, req.GetUserId(), req.GetItemId())
+		if err != nil {
+			logger("UpdateFinancialInstitution", err).Error(fmt.Sprintf("Repo call to GetItemByID failed"))
+			return nil, utils.InternalServerError
+		}
+	} else {
+		item, err = s.financialItemRepo.GetItemByPlaidID(tx, req.GetUserId(), req.GetPlaidItemId())
+		if err != nil {
+			logger("UpdateFinancialInstitution", err).Error(fmt.Sprintf("Repo call to GetItemByPlaidID failed"))
+			return nil, utils.InternalServerError
+		}
 	}
 
 	startDate := time.Now().Local().Add(time.Duration(240) * time.Hour * -1).Format("2006-01-02") // 10 days back
@@ -328,11 +340,6 @@ func (s *Service) AddFinancialTransactions(ctx context.Context, req *AddFinancia
 		s.financialTransactionRepo.AddTransaction(tx, &transaction)
 	}
 
-	if int64(len(filteredTransactions)) != req.GetExpectedCount() {
-		logger("AddFinancialTransactions", nil).Warn(fmt.Sprintf("Count mismatch. Expected: %d, Added: %d transactions",
-			req.GetExpectedCount(), len(filteredTransactions)))
-	}
-
 	err = s.txRepo.CommitTx(tx)
 	if err != nil {
 		logger("AddFinancialTransactions", err).Error(utils.CommitTxErrorMsg)
@@ -340,35 +347,42 @@ func (s *Service) AddFinancialTransactions(ctx context.Context, req *AddFinancia
 	}
 
 	res := &AddFinancialTransactionsResponse{
-		Success: true,
+		NewTransactions: int64(len(filteredTransactions)),
 	}
 
 	return res, nil
 }
 
-// // RemoveTransactions Get transactions from Plaid given the pagination offset to be added to the db
-// func RemoveTransactions(w http.ResponseWriter, r *http.Request, userID int64, itemID int64, plaidTransactionIDs []string) {
-// 	ctx := context.Background()
-// 	tx, err := db.BeginTx(ctx, nil)
-// 	if err != nil {
-// 		log.Fatal(err)
-// 	}
+// RemoveFinancialTransactions remove financial transactions from the db
+func (s *Service) RemoveFinancialTransactions(ctx context.Context, req *RemoveFinancialTransactionsRequest) (*Empty, error) {
+	tx, err := s.txRepo.StartTx(ctx)
+	if err != nil {
+		logger("RemoveFinancialTransactions", err).Error(utils.StartTxErrorMsg)
+		return nil, utils.InternalServerError
+	}
 
-// 	for i := 0; i < len(plaidTransactionIDs); i++ {
-// 		_, err = db.Exec("DELETE FROM transactions2 WHERE user_id=$1 AND item_id=$2 AND plaid_transaction_id=$3;", userID, itemID, plaidTransactionIDs[i])
-// 		if err != nil {
-// 			tx.Rollback()
-// 			http.Error(w, http.StatusText(500)+". Error deleting transaction. "+err.Error(), http.StatusInternalServerError)
-// 			return
-// 		}
-// 	}
+	for _, transactionID := range req.GetTransactionIds() {
+		err := s.financialTransactionRepo.RemoveTransactionByID(tx, req.GetUserId(), transactionID)
+		if err != nil {
+			logger("RemoveFinancialTransactions", err).Error(fmt.Sprintf("Repo call to RemoveTransactionByID failed"))
+		}
+	}
 
-// 	err = tx.Commit()
-// 	if err != nil {
-// 		http.Error(w, http.StatusText(500)+". Failed to commit tx changes to db. "+err.Error(), http.StatusInternalServerError)
-// 		return
-// 	}
+	for _, plaidTransactionID := range req.GetPlaidTransactionIds() {
+		transaction, err := s.financialTransactionRepo.GetTransactionByPlaidID(tx, req.GetUserId(), plaidTransactionID)
+		if err != nil {
+			logger("RemoveFinancialTransactions", err).Error(fmt.Sprintf("Repo call to GetTransactionByPlaidID failed"))
+		}
+		err = s.financialTransactionRepo.RemoveTransactionByID(tx, req.GetUserId(), transaction.ID)
+		if err != nil {
+			logger("RemoveFinancialTransactions", err).Error(fmt.Sprintf("Repo call to RemoveTransactionByID failed"))
+		}
+	}
 
-// 	w.Header().Set("Content-Type", "application/json")
-// 	w.WriteHeader(http.StatusOK)
-// }
+	err = s.txRepo.CommitTx(tx)
+	if err != nil {
+		logger("RemoveFinancialTransactions", err).Error(utils.CommitTxErrorMsg)
+		return nil, utils.InternalServerError
+	}
+	return &Empty{}, nil
+}

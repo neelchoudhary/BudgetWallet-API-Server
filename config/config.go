@@ -49,17 +49,14 @@ func NewDBConfig(host string, port int, user string, password string, dbname str
 
 // ServerConfig server configuration struct
 type ServerConfig struct {
-	Environment       string
-	Host              string
-	APIServerPort     string
-	WebhookServerPort string
-	TLSKeyPath        string
-	TLSCertPath       string
+	Environment   string
+	Host          string
+	APIServerPort string
+	TLSKeyPath    string
+	TLSCertPath   string
 }
 
 // NewServerConfig creates new ServerConfig
-func NewServerConfig(environment string, host string, apiServerPort string, webhookServerPort string,
-	tlsKeyPath string, tlsCertPath string) *ServerConfig {
-	return &ServerConfig{Environment: environment, Host: host, APIServerPort: apiServerPort,
-		WebhookServerPort: webhookServerPort, TLSKeyPath: tlsKeyPath, TLSCertPath: tlsCertPath}
+func NewServerConfig(environment string, host string, apiServerPort string, tlsKeyPath string, tlsCertPath string) *ServerConfig {
+	return &ServerConfig{Environment: environment, Host: host, APIServerPort: apiServerPort, TLSKeyPath: tlsKeyPath, TLSCertPath: tlsCertPath}
 }
