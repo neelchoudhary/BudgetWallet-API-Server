@@ -9,19 +9,24 @@ message FinancialAccount {
     int64 item_id = 3;
     string plaid_account_id = 4;
     double current_balance = 5;
-    string account_name = 6;
-    string official_name = 7;
-    string account_type = 8;
-    string account_subtype = 9;
-    string account_mask = 10;
-    bool selected = 11;
+    double available_balance = 6;
+    string account_name = 7;
+    string official_name = 8;
+    string account_type = 9;
+    string account_subtype = 10;
+    string account_mask = 11;
+    bool selected = 12;
 }
 
 message FinancialInstitution {
     int64 id = 1;
-    string institution_name = 2;
-    string institution_color = 3;
-    string institution_logo = 4;
+    int64 user_id = 2;
+    string institution_name = 3;
+    string institution_color = 4;
+    string institution_logo = 5;
+    string error_code = 6;
+    string error_dev_msg = 7;
+    string error_user_msg = 8;
 }
 
 message FinancialTransaction {

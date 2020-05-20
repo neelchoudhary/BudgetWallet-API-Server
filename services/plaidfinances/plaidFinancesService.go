@@ -10,7 +10,6 @@ import (
 
 	"github.com/neelchoudhary/budgetwallet-api-server/models"
 	"github.com/neelchoudhary/budgetwallet-api-server/postgresql"
-	"github.com/neelchoudhary/budgetwallet-api-server/services/shared"
 	"github.com/neelchoudhary/budgetwallet-api-server/utils"
 )
 
@@ -74,11 +73,6 @@ func (s *Service) LinkFinancialInstitution(ctx context.Context, req *LinkFinanci
 		}
 	}
 
-	var pbAccounts []*shared.FinancialAccount
-	for _, account := range accounts {
-		pbAccounts = append(pbAccounts, shared.DataToAccountPb(account))
-	}
-
 	err = s.txRepo.CommitTx(tx)
 	if err != nil {
 		logger("LinkFinancialInstitution", err).Error(utils.CommitTxErrorMsg)
@@ -86,7 +80,7 @@ func (s *Service) LinkFinancialInstitution(ctx context.Context, req *LinkFinanci
 	}
 
 	res := &LinkFinancialInstitutionResponse{
-		FinancialAccounts: pbAccounts,
+		Success: true,
 	}
 	return res, nil
 }
@@ -187,6 +181,11 @@ func (s *Service) RemoveFinancialInstitution(ctx context.Context, req *RemoveFin
 	err = item.RemoveItemFromPlaid(s.plaidClient)
 	if err != nil {
 		logger("RemoveFinancialInstitution", err).Error(fmt.Sprintf("Item call to RemoveItemFromPlaid failed"))
+		return nil, utils.InternalServerError
+	}
+	err = s.financialTransactionRepo.RemoveItemTransactions(tx, req.GetUserId(), req.GetItemId())
+	if err != nil {
+		logger("RemoveFinancialInstitution", err).Error(fmt.Sprintf("Repo call to RemoveItemTransactions failed"))
 		return nil, utils.InternalServerError
 	}
 	err = s.financialAccountRepo.RemoveItemAccounts(tx, req.GetUserId(), req.GetItemId())

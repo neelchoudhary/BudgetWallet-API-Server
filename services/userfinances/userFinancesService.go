@@ -161,22 +161,26 @@ func dataToItemPb(data models.FinancialItem) *shared.FinancialInstitution {
 		InstitutionName:  data.InstitutionName,
 		InstitutionColor: data.InstitutionColor,
 		InstitutionLogo:  data.InstitutionLogo,
+		ErrorCode:        data.ErrorCode,
+		ErrorDevMsg:      data.ErrorDevMessage,
+		ErrorUserMsg:     data.ErrorUserMessage,
 	}
 }
 
 func dataToAccountPb(data models.FinancialAccount) *shared.FinancialAccount {
 	return &shared.FinancialAccount{
-		Id:             data.ID,
-		UserId:         data.UserID,
-		ItemId:         data.ItemID,
-		PlaidAccountId: data.PlaidAccountID,
-		CurrentBalance: data.CurrentBalance,
-		AccountName:    data.AccountName,
-		OfficialName:   data.OfficialName,
-		AccountType:    data.AccountType,
-		AccountSubtype: data.AccountSubType,
-		AccountMask:    data.AccountMask,
-		Selected:       data.Selected,
+		Id:               data.ID,
+		UserId:           data.UserID,
+		ItemId:           data.ItemID,
+		PlaidAccountId:   data.PlaidAccountID,
+		CurrentBalance:   data.CurrentBalance,
+		AvailableBalance: data.AvailableBalance,
+		AccountName:      data.AccountName,
+		OfficialName:     data.OfficialName,
+		AccountType:      data.AccountType,
+		AccountSubtype:   data.AccountSubType,
+		AccountMask:      data.AccountMask,
+		Selected:         data.Selected,
 	}
 }
 

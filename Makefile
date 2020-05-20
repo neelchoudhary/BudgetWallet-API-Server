@@ -23,11 +23,11 @@ run-auth-client: ## connect to the local auth client
 run-app-client: ## connect to the local app client
 	go run cmd/client/*.go -serverEnv local -clientName app -serverTLSPath ssl/ca.crt -serverAddress localhost:50051
 
-.PHONY: prd-run-auth-client-prd 
+.PHONY: run-auth-client-prd 
 run-auth-client-prd: ## connect to the prd auth client
 	go run cmd/client/*.go -serverEnv prd -clientName auth -serverTLSPath ssl/ca.crt -serverAddress neelchoudhary.com:1443
 
-.PHONY: prd-run-app-client-prd 
+.PHONY: run-app-client-prd 
 run-app-client-prd: ## connect to the prd app client
 	go run cmd/client/*.go -serverEnv prd -clientName app -serverTLSPath ssl/ca.crt -serverAddress neelchoudhary.com:1443
 

@@ -67,7 +67,7 @@ func (r *financialTransactionRepository) GetTransactionByPlaidID(tx *sql.Tx, use
 
 // GetAccountTransactions get transactions by userID and accountID from the DB
 func (r *financialTransactionRepository) GetAccountTransactions(tx *sql.Tx, userID int64, accountID int64) ([]models.FinancialTransaction, error) {
-	rows, err := tx.Query("SELECT * FROM transactions WHERE user_id=$1 AND account_id=$2;", userID, accountID)
+	rows, err := tx.Query("SELECT * FROM transactions WHERE user_id=$1 AND account_id=$2 ORDER BY date DESC;", userID, accountID)
 	if err != nil {
 		return nil, err
 	}
@@ -93,7 +93,7 @@ func (r *financialTransactionRepository) GetAccountTransactions(tx *sql.Tx, user
 
 // GetItemTransactions get transactions by userID and itemID from the DB
 func (r *financialTransactionRepository) GetItemTransactions(tx *sql.Tx, userID int64, itemID int64) ([]models.FinancialTransaction, error) {
-	rows, err := tx.Query("SELECT * FROM transactions WHERE user_id=$1 AND item_id=$2;", userID, itemID)
+	rows, err := tx.Query("SELECT * FROM transactions WHERE user_id=$1 AND item_id=$2 ORDER BY date DESC;", userID, itemID)
 	if err != nil {
 		return nil, err
 	}
@@ -119,7 +119,7 @@ func (r *financialTransactionRepository) GetItemTransactions(tx *sql.Tx, userID 
 
 // GetUserTransactions get transactions by userID from the DB
 func (r *financialTransactionRepository) GetUserTransactions(tx *sql.Tx, userID int64) ([]models.FinancialTransaction, error) {
-	rows, err := tx.Query("SELECT * FROM transactions WHERE user_id=$1;", userID)
+	rows, err := tx.Query("SELECT * FROM transactions WHERE user_id=$1 ORDER BY date DESC;", userID)
 	if err != nil {
 		return nil, err
 	}

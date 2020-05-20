@@ -6,6 +6,7 @@ import (
 	"github.com/neelchoudhary/budgetwallet-api-server/config"
 	"github.com/neelchoudhary/budgetwallet-api-server/postgresql"
 	"github.com/neelchoudhary/budgetwallet-api-server/services/auth"
+	"github.com/neelchoudhary/budgetwallet-api-server/services/dataprocessing"
 	"github.com/neelchoudhary/budgetwallet-api-server/services/financialcategories"
 	"github.com/neelchoudhary/budgetwallet-api-server/services/plaidfinances"
 	"github.com/neelchoudhary/budgetwallet-api-server/services/userfinances"
@@ -61,9 +62,10 @@ func main() {
 	userFinancesService := userfinances.NewUserFinancesServer(&txRepo, &itemRepo, &accountRepo, &transactionRepo)
 	plaidFinancesService := plaidfinances.NewPlaidFinancesServer(&txRepo, &itemRepo, &accountRepo, &transactionRepo, &categoryRepo, plaidClient)
 	financialCategoriesService := financialcategories.NewFinancialCategoriesServer(&txRepo, &categoryRepo, plaidClient)
+	dataProcessingService := dataprocessing.NewDataProcessingServer(&txRepo, &accountRepo, &transactionRepo)
 
 	// Create Server
-	apiServer := NewServer(serverConfig, jwtManager, &authService, &userFinancesService, &plaidFinancesService, &financialCategoriesService)
+	apiServer := NewServer(serverConfig, jwtManager, &authService, &userFinancesService, &plaidFinancesService, &financialCategoriesService, &dataProcessingService)
 
 	err := apiServer.runGRPCServer()
 	utils.LogIfFatalAndExit(err, "Failed to run gRPC server: ")

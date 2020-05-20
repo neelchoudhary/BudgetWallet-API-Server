@@ -5,6 +5,8 @@ import (
 	"log"
 	"net"
 
+	"github.com/neelchoudhary/budgetwallet-api-server/services/dataprocessing"
+
 	"github.com/neelchoudhary/budgetwallet-api-server/services/financialcategories"
 
 	"github.com/neelchoudhary/budgetwallet-api-server/config"
@@ -24,6 +26,7 @@ type Server struct {
 	userFinancesService        *userfinances.UserFinancesServiceServer
 	plaidFinancesService       *plaidfinances.PlaidFinancesServiceServer
 	financialCategoriesService *financialcategories.FinancialCategoryServiceServer
+	dataProcessingService      *dataprocessing.DataProcessingServiceServer
 }
 
 // NewServer construct a new server with service dependencies
@@ -32,7 +35,8 @@ func NewServer(serverConfig *config.ServerConfig,
 	authService *auth.AuthServiceServer,
 	userFinancesService *userfinances.UserFinancesServiceServer,
 	plaidFinancesService *plaidfinances.PlaidFinancesServiceServer,
-	financialCategoriesService *financialcategories.FinancialCategoryServiceServer) *Server {
+	financialCategoriesService *financialcategories.FinancialCategoryServiceServer,
+	dataProcessingService *dataprocessing.DataProcessingServiceServer) *Server {
 	return &Server{
 		serverConfig:               serverConfig,
 		jwtManager:                 jwtManager,
@@ -40,6 +44,7 @@ func NewServer(serverConfig *config.ServerConfig,
 		userFinancesService:        userFinancesService,
 		plaidFinancesService:       plaidFinancesService,
 		financialCategoriesService: financialCategoriesService,
+		dataProcessingService:      dataProcessingService,
 	}
 }
 
@@ -70,6 +75,7 @@ func (s *Server) runGRPCServer() error {
 	userfinances.RegisterUserFinancesServiceServer(grpcServer, *s.userFinancesService)
 	plaidfinances.RegisterPlaidFinancesServiceServer(grpcServer, *s.plaidFinancesService)
 	financialcategories.RegisterFinancialCategoryServiceServer(grpcServer, *s.financialCategoriesService)
+	dataprocessing.RegisterDataProcessingServiceServer(grpcServer, *s.dataProcessingService)
 
 	// Start gRPC server
 	log.Println("starting gRPC server...")
