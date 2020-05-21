@@ -2,6 +2,7 @@ package dataprocessing
 
 import (
 	context "context"
+	fmt "fmt"
 	"strings"
 	"time"
 
@@ -34,12 +35,20 @@ func NewDataProcessingServer(txRepo *postgresql.TxRepository, accountRepo *model
 func (s *Service) GetAccountDailySnapshots(ctx context.Context, req *GetAccountDailySnapshotsRequest) (*GetAccountDailySnapshotsResponse, error) {
 	tx, err := s.txRepo.StartTx(ctx)
 	if err != nil {
-		logger("GetFinancialCategories", err).Error(utils.StartTxErrorMsg)
+		logger("GetAccountDailySnapshots", err).Error(utils.StartTxErrorMsg)
 		return nil, utils.InternalServerError
 	}
-	transactions, err := s.financialTransactionRepo.GetAccountTransactions(tx, req.GetUserId(), req.GetAccountId())
+
+	userID, err := utils.GetUserIDMetadata(ctx)
 	if err != nil {
-		// todo
+		logger("GetAccountDailySnapshots", err).Error(fmt.Sprintf("GetUserIDMetadata failed"))
+		return nil, utils.InternalServerError
+	}
+
+	transactions, err := s.financialTransactionRepo.GetAccountTransactions(tx, userID, req.GetAccountId())
+	if err != nil {
+		logger("GetAccountDailySnapshots", err).Error(fmt.Sprintf("Repo call to GetAccountTransactions failed"))
+		return nil, utils.InternalServerError
 	}
 
 	// Get oldest date
@@ -49,9 +58,10 @@ func (s *Service) GetAccountDailySnapshots(ctx context.Context, req *GetAccountD
 	currentDate := time.Now().Format("2006-01-02")
 
 	// Get account to find current balance
-	account, err := s.financialAccountRepo.GetAccountByID(tx, req.GetUserId(), req.GetAccountId())
+	account, err := s.financialAccountRepo.GetAccountByID(tx, userID, req.GetAccountId())
 	if err != nil {
-		return nil, err
+		logger("GetAccountDailySnapshots", err).Error(fmt.Sprintf("Repo call to GetAccountByID failed"))
+		return nil, utils.InternalServerError
 	}
 	currentBalance := account.CurrentBalance
 
@@ -97,7 +107,7 @@ func (s *Service) GetAccountDailySnapshots(ctx context.Context, req *GetAccountD
 
 	err = s.txRepo.CommitTx(tx)
 	if err != nil {
-		logger("GetFinancialCategories", err).Error(utils.CommitTxErrorMsg)
+		logger("GetAccountDailySnapshots", err).Error(utils.CommitTxErrorMsg)
 		return nil, err
 	}
 

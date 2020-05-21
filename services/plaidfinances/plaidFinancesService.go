@@ -49,7 +49,13 @@ func (s *Service) LinkFinancialInstitution(ctx context.Context, req *LinkFinanci
 		return nil, utils.InternalServerError
 	}
 
-	item, err := models.NewFinancialItemFromPlaid(req.GetUserId(), req.GetPublicToken(), req.GetPlaidInstitutionId(), s.plaidClient)
+	userID, err := utils.GetUserIDMetadata(ctx)
+	if err != nil {
+		logger("LinkFinancialInstitution", err).Error(fmt.Sprintf("GetUserIDMetadata failed"))
+		return nil, utils.InternalServerError
+	}
+
+	item, err := models.NewFinancialItemFromPlaid(userID, req.GetPublicToken(), req.GetPlaidInstitutionId(), s.plaidClient)
 	if err != nil {
 		logger("LinkFinancialInstitution", err).Error(fmt.Sprintf("Item call to NewFinancialItemFromPlaid failed"))
 		return nil, utils.InternalServerError
@@ -59,7 +65,7 @@ func (s *Service) LinkFinancialInstitution(ctx context.Context, req *LinkFinanci
 		logger("LinkFinancialInstitution", err).Error(fmt.Sprintf("Repo call to AddItem failed"))
 		return nil, utils.InternalServerError
 	}
-	accounts, err := item.GetFinancialAccountsFromPlaid(req.GetUserId(), s.plaidClient)
+	accounts, err := item.GetFinancialAccountsFromPlaid(userID, s.plaidClient)
 	if err != nil {
 		logger("LinkFinancialInstitution", err).Error(fmt.Sprintf("Item call to GetFinancialAccountsFromPlaid failed"))
 		return nil, utils.InternalServerError
@@ -93,7 +99,13 @@ func (s *Service) UpdateFinancialInstitution(ctx context.Context, req *UpdateFin
 		return nil, utils.InternalServerError
 	}
 
-	item, err := s.financialItemRepo.GetItemByID(tx, req.GetUserId(), req.GetItemId())
+	userID, err := utils.GetUserIDMetadata(ctx)
+	if err != nil {
+		logger("UpdateFinancialInstitution", err).Error(fmt.Sprintf("GetUserIDMetadata failed"))
+		return nil, utils.InternalServerError
+	}
+
+	item, err := s.financialItemRepo.GetItemByID(tx, userID, req.GetItemId())
 	if err != nil {
 		logger("UpdateFinancialInstitution", err).Error(fmt.Sprintf("Repo call to GetItemByID failed"))
 		return nil, utils.InternalServerError
@@ -103,7 +115,7 @@ func (s *Service) UpdateFinancialInstitution(ctx context.Context, req *UpdateFin
 		logger("UpdateFinancialInstitution", err).Error(fmt.Sprintf("Item call to UpdateItemFromPlaid failed"))
 		return nil, utils.InternalServerError
 	}
-	err = s.financialItemRepo.UpdateItem(tx, req.GetUserId(), req.GetItemId(), item)
+	err = s.financialItemRepo.UpdateItem(tx, userID, req.GetItemId(), item)
 	if err != nil {
 		logger("UpdateFinancialInstitution", err).Error(fmt.Sprintf("Repo call to UpdateItem failed"))
 		return nil, utils.InternalServerError
@@ -129,7 +141,13 @@ func (s *Service) UpdateFinancialAccounts(ctx context.Context, req *UpdateFinanc
 		return nil, utils.InternalServerError
 	}
 
-	item, err := s.financialItemRepo.GetItemByID(tx, req.GetUserId(), req.GetItemId())
+	userID, err := utils.GetUserIDMetadata(ctx)
+	if err != nil {
+		logger("UpdateFinancialAccounts", err).Error(fmt.Sprintf("GetUserIDMetadata failed"))
+		return nil, utils.InternalServerError
+	}
+
+	item, err := s.financialItemRepo.GetItemByID(tx, userID, req.GetItemId())
 	if err != nil {
 		logger("UpdateFinancialAccounts", err).Error(fmt.Sprintf("Repo call to GetItemByID failed"))
 		return nil, utils.InternalServerError
@@ -140,13 +158,13 @@ func (s *Service) UpdateFinancialAccounts(ctx context.Context, req *UpdateFinanc
 		return nil, utils.InternalServerError
 	}
 	for _, plaidAccount := range plaidResponse.Accounts {
-		account, err := s.financialAccountRepo.GetAccountByPlaidID(tx, req.GetUserId(), plaidAccount.AccountID)
+		account, err := s.financialAccountRepo.GetAccountByPlaidID(tx, userID, plaidAccount.AccountID)
 		if err != nil {
 			logger("UpdateFinancialAccounts", err).Error(fmt.Sprintf("Repo call to GetAccountByPlaidID failed"))
 			return nil, utils.InternalServerError
 		}
 		account.UpdateAccountFromPlaid(&plaidAccount)
-		err = s.financialAccountRepo.UpdateAccount(tx, req.GetUserId(), account.GetAccountID(), account)
+		err = s.financialAccountRepo.UpdateAccount(tx, userID, account.GetAccountID(), account)
 		if err != nil {
 			logger("UpdateFinancialAccounts", err).Error(fmt.Sprintf("Repo call to UpdateAccount failed"))
 			return nil, utils.InternalServerError
@@ -173,7 +191,13 @@ func (s *Service) RemoveFinancialInstitution(ctx context.Context, req *RemoveFin
 		return nil, utils.InternalServerError
 	}
 
-	item, err := s.financialItemRepo.GetItemByID(tx, req.GetUserId(), req.GetItemId())
+	userID, err := utils.GetUserIDMetadata(ctx)
+	if err != nil {
+		logger("RemoveFinancialInstitution", err).Error(fmt.Sprintf("GetUserIDMetadata failed"))
+		return nil, utils.InternalServerError
+	}
+
+	item, err := s.financialItemRepo.GetItemByID(tx, userID, req.GetItemId())
 	if err != nil {
 		logger("RemoveFinancialInstitution", err).Error(fmt.Sprintf("Repo call to GetItemByID failed"))
 		return nil, utils.InternalServerError
@@ -183,17 +207,17 @@ func (s *Service) RemoveFinancialInstitution(ctx context.Context, req *RemoveFin
 		logger("RemoveFinancialInstitution", err).Error(fmt.Sprintf("Item call to RemoveItemFromPlaid failed"))
 		return nil, utils.InternalServerError
 	}
-	err = s.financialTransactionRepo.RemoveItemTransactions(tx, req.GetUserId(), req.GetItemId())
+	err = s.financialTransactionRepo.RemoveItemTransactions(tx, userID, req.GetItemId())
 	if err != nil {
 		logger("RemoveFinancialInstitution", err).Error(fmt.Sprintf("Repo call to RemoveItemTransactions failed"))
 		return nil, utils.InternalServerError
 	}
-	err = s.financialAccountRepo.RemoveItemAccounts(tx, req.GetUserId(), req.GetItemId())
+	err = s.financialAccountRepo.RemoveItemAccounts(tx, userID, req.GetItemId())
 	if err != nil {
 		logger("RemoveFinancialInstitution", err).Error(fmt.Sprintf("Repo call to RemoveItemAccounts failed"))
 		return nil, utils.InternalServerError
 	}
-	err = s.financialItemRepo.RemoveItem(tx, req.GetUserId(), req.GetItemId())
+	err = s.financialItemRepo.RemoveItem(tx, userID, req.GetItemId())
 	if err != nil {
 		logger("RemoveFinancialInstitution", err).Error(fmt.Sprintf("Repo call to RemoveItem failed"))
 		return nil, utils.InternalServerError
@@ -220,23 +244,29 @@ func (s *Service) AddHistoricalFinancialTransactions(ctx context.Context, req *A
 		return nil, utils.InternalServerError
 	}
 
+	userID, err := utils.GetUserIDMetadata(ctx)
+	if err != nil {
+		logger("AddHistoricalFinancialTransactions", err).Error(fmt.Sprintf("GetUserIDMetadata failed"))
+		return nil, utils.InternalServerError
+	}
+
 	// Get item by id
 	var item *models.FinancialItem
 	if req.GetItemId() != 0 {
-		item, err = s.financialItemRepo.GetItemByID(tx, req.GetUserId(), req.GetItemId())
+		item, err = s.financialItemRepo.GetItemByID(tx, userID, req.GetItemId())
 		if err != nil {
-			logger("UpdateFinancialInstitution", err).Error(fmt.Sprintf("Repo call to GetItemByID failed"))
+			logger("AddHistoricalFinancialTransactions", err).Error(fmt.Sprintf("Repo call to GetItemByID failed"))
 			return nil, utils.InternalServerError
 		}
 	} else {
-		item, err = s.financialItemRepo.GetItemByPlaidID(tx, req.GetUserId(), req.GetPlaidItemId())
+		item, err = s.financialItemRepo.GetItemByPlaidID(tx, userID, req.GetPlaidItemId())
 		if err != nil {
-			logger("UpdateFinancialInstitution", err).Error(fmt.Sprintf("Repo call to GetItemByPlaidID failed"))
+			logger("AddHistoricalFinancialTransactions", err).Error(fmt.Sprintf("Repo call to GetItemByPlaidID failed"))
 			return nil, utils.InternalServerError
 		}
 	}
 	// Remove all transactions for this item
-	err = s.financialTransactionRepo.RemoveItemTransactions(tx, req.GetUserId(), item.ID)
+	err = s.financialTransactionRepo.RemoveItemTransactions(tx, userID, item.ID)
 	if err != nil {
 		logger("AddHistoricalFinancialTransactions", err).Error(fmt.Sprintf("Repo call to RemoveItemTransactions failed"))
 		return nil, utils.InternalServerError
@@ -250,7 +280,7 @@ func (s *Service) AddHistoricalFinancialTransactions(ctx context.Context, req *A
 	}
 	for _, transaction := range allTransactions {
 		// Set the account id and category id for this transaction
-		account, err := s.financialAccountRepo.GetAccountByPlaidID(tx, req.GetUserId(), transaction.PlaidAccountID)
+		account, err := s.financialAccountRepo.GetAccountByPlaidID(tx, userID, transaction.PlaidAccountID)
 		if err != nil {
 			logger("AddHistoricalFinancialTransactions", err).Error(fmt.Sprintf("Repo call to GetAccountByPlaidID failed"))
 			return nil, utils.InternalServerError
@@ -291,18 +321,24 @@ func (s *Service) AddFinancialTransactions(ctx context.Context, req *AddFinancia
 		return nil, utils.InternalServerError
 	}
 
+	userID, err := utils.GetUserIDMetadata(ctx)
+	if err != nil {
+		logger("AddFinancialTransactions", err).Error(fmt.Sprintf("GetUserIDMetadata failed"))
+		return nil, utils.InternalServerError
+	}
+
 	// Get item by id
 	var item *models.FinancialItem
 	if req.GetItemId() != 0 {
-		item, err = s.financialItemRepo.GetItemByID(tx, req.GetUserId(), req.GetItemId())
+		item, err = s.financialItemRepo.GetItemByID(tx, userID, req.GetItemId())
 		if err != nil {
-			logger("UpdateFinancialInstitution", err).Error(fmt.Sprintf("Repo call to GetItemByID failed"))
+			logger("AddFinancialTransactions", err).Error(fmt.Sprintf("Repo call to GetItemByID failed"))
 			return nil, utils.InternalServerError
 		}
 	} else {
-		item, err = s.financialItemRepo.GetItemByPlaidID(tx, req.GetUserId(), req.GetPlaidItemId())
+		item, err = s.financialItemRepo.GetItemByPlaidID(tx, userID, req.GetPlaidItemId())
 		if err != nil {
-			logger("UpdateFinancialInstitution", err).Error(fmt.Sprintf("Repo call to GetItemByPlaidID failed"))
+			logger("AddFinancialTransactions", err).Error(fmt.Sprintf("Repo call to GetItemByPlaidID failed"))
 			return nil, utils.InternalServerError
 		}
 	}
@@ -314,7 +350,7 @@ func (s *Service) AddFinancialTransactions(ctx context.Context, req *AddFinancia
 		return nil, utils.InternalServerError
 	}
 	filteredTransactions := models.FilterTransactions(allTransactions, func(t models.FinancialTransaction) bool {
-		exists, err := s.financialTransactionRepo.DoesTransactionExist(tx, req.GetUserId(), t.PlaidTransactionID)
+		exists, err := s.financialTransactionRepo.DoesTransactionExist(tx, userID, t.PlaidTransactionID)
 		if err != nil {
 			logger("AddFinancialTransactions", err).Error(fmt.Sprintf("Repo call to DoesTransactionExist failed"))
 			return false
@@ -322,7 +358,7 @@ func (s *Service) AddFinancialTransactions(ctx context.Context, req *AddFinancia
 		return !exists
 	})
 	for _, transaction := range filteredTransactions {
-		account, err := s.financialAccountRepo.GetAccountByPlaidID(tx, req.GetUserId(), transaction.PlaidAccountID)
+		account, err := s.financialAccountRepo.GetAccountByPlaidID(tx, userID, transaction.PlaidAccountID)
 		if err != nil {
 			logger("AddFinancialTransactions", err).Error(fmt.Sprintf("Repo call to GetAccountByPlaidID failed"))
 			return nil, utils.InternalServerError
@@ -360,19 +396,25 @@ func (s *Service) RemoveFinancialTransactions(ctx context.Context, req *RemoveFi
 		return nil, utils.InternalServerError
 	}
 
+	userID, err := utils.GetUserIDMetadata(ctx)
+	if err != nil {
+		logger("RemoveFinancialTransactions", err).Error(fmt.Sprintf("GetUserIDMetadata failed"))
+		return nil, utils.InternalServerError
+	}
+
 	for _, transactionID := range req.GetTransactionIds() {
-		err := s.financialTransactionRepo.RemoveTransactionByID(tx, req.GetUserId(), transactionID)
+		err := s.financialTransactionRepo.RemoveTransactionByID(tx, userID, transactionID)
 		if err != nil {
 			logger("RemoveFinancialTransactions", err).Error(fmt.Sprintf("Repo call to RemoveTransactionByID failed"))
 		}
 	}
 
 	for _, plaidTransactionID := range req.GetPlaidTransactionIds() {
-		transaction, err := s.financialTransactionRepo.GetTransactionByPlaidID(tx, req.GetUserId(), plaidTransactionID)
+		transaction, err := s.financialTransactionRepo.GetTransactionByPlaidID(tx, userID, plaidTransactionID)
 		if err != nil {
 			logger("RemoveFinancialTransactions", err).Error(fmt.Sprintf("Repo call to GetTransactionByPlaidID failed"))
 		}
-		err = s.financialTransactionRepo.RemoveTransactionByID(tx, req.GetUserId(), transaction.ID)
+		err = s.financialTransactionRepo.RemoveTransactionByID(tx, userID, transaction.ID)
 		if err != nil {
 			logger("RemoveFinancialTransactions", err).Error(fmt.Sprintf("Repo call to RemoveTransactionByID failed"))
 		}

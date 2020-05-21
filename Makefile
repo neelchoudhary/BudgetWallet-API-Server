@@ -15,13 +15,9 @@ help: ## help information about make commands
 run-server: ## run the grpc server locally
 	./cmd/scripts/run-server-local.sh
 
-.PHONY: run-auth-client 
-run-auth-client: ## connect to the local auth client
-	go run cmd/client/*.go -serverEnv local -clientName auth -serverTLSPath ssl/ca.crt -serverAddress localhost:50051
-
-.PHONY: run-app-client 
-run-app-client: ## connect to the local app client
-	go run cmd/client/*.go -serverEnv local -clientName app -serverTLSPath ssl/ca.crt -serverAddress localhost:50051
+.PHONY: run-client 
+run-client: ## connect to the local client
+	./cmd/scripts/run-client-local.sh
 
 .PHONY: run-auth-client-prd 
 run-auth-client-prd: ## connect to the prd auth client

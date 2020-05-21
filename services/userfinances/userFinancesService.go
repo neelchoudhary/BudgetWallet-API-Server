@@ -40,7 +40,13 @@ func (s *Service) GetFinancialInstitutions(ctx context.Context, req *GetFinancia
 		return nil, utils.InternalServerError
 	}
 
-	items, err := s.financialItemRepo.GetUserItems(tx, req.GetUserId())
+	userID, err := utils.GetUserIDMetadata(ctx)
+	if err != nil {
+		logger("GetFinancialInstitutions", err).Error(fmt.Sprintf("GetUserIDMetadata failed"))
+		return nil, utils.InternalServerError
+	}
+
+	items, err := s.financialItemRepo.GetUserItems(tx, userID)
 	if err != nil {
 		logger("GetFinancialInstitutions", err).Error(fmt.Sprintf("Repo call to GetUserItems failed"))
 		return nil, utils.InternalServerError
@@ -71,7 +77,13 @@ func (s *Service) GetFinancialAccounts(ctx context.Context, req *GetFinancialAcc
 		return nil, utils.InternalServerError
 	}
 
-	accounts, err := s.financialAccountRepo.GetItemAccounts(tx, req.UserId, req.ItemId)
+	userID, err := utils.GetUserIDMetadata(ctx)
+	if err != nil {
+		logger("GetFinancialAccounts", err).Error(fmt.Sprintf("GetUserIDMetadata failed"))
+		return nil, utils.InternalServerError
+	}
+
+	accounts, err := s.financialAccountRepo.GetItemAccounts(tx, userID, req.ItemId)
 	if err != nil {
 		logger("GetFinancialAccounts", err).Error(fmt.Sprintf("Repo call to GetItemAccounts failed"))
 		return nil, utils.InternalServerError
@@ -101,13 +113,19 @@ func (s *Service) ToggleFinancialAccount(ctx context.Context, req *ToggleFinanci
 		return nil, utils.InternalServerError
 	}
 
-	account, err := s.financialAccountRepo.GetAccountByID(tx, req.GetUserId(), req.GetAccountId())
+	userID, err := utils.GetUserIDMetadata(ctx)
+	if err != nil {
+		logger("ToggleFinancialAccount", err).Error(fmt.Sprintf("GetUserIDMetadata failed"))
+		return nil, utils.InternalServerError
+	}
+
+	account, err := s.financialAccountRepo.GetAccountByID(tx, userID, req.GetAccountId())
 	if err != nil {
 		logger("ToggleFinancialAccount", err).Error(fmt.Sprintf("Repo call to GetAccountByID failed"))
 		return nil, utils.InternalServerError
 	}
 	account.SetSelected(req.GetSelected())
-	err = s.financialAccountRepo.UpdateAccount(tx, req.GetUserId(), req.GetAccountId(), account)
+	err = s.financialAccountRepo.UpdateAccount(tx, userID, req.GetAccountId(), account)
 	if err != nil {
 		logger("ToggleFinancialAccount", err).Error(fmt.Sprintf("Repo call to UpdateAccount failed"))
 		return nil, utils.InternalServerError
@@ -133,7 +151,13 @@ func (s *Service) GetFinancialTransactions(ctx context.Context, req *GetFinancia
 		return nil, utils.InternalServerError
 	}
 
-	transactions, err := s.financialTransactionRepo.GetItemTransactions(tx, req.UserId, req.ItemId)
+	userID, err := utils.GetUserIDMetadata(ctx)
+	if err != nil {
+		logger("GetFinancialTransactions", err).Error(fmt.Sprintf("GetUserIDMetadata failed"))
+		return nil, utils.InternalServerError
+	}
+
+	transactions, err := s.financialTransactionRepo.GetItemTransactions(tx, userID, req.ItemId)
 	if err != nil {
 		logger("GetFinancialTransactions", err).Error(fmt.Sprintf("Repo call to GetItemTransactions failed"))
 		return nil, utils.InternalServerError
