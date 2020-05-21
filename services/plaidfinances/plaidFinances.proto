@@ -10,8 +10,8 @@ message Category {
 }
 
 message LinkFinancialInstitutionRequest {
-    string public_token = 2;
-    string plaid_institution_id = 3;
+    string public_token = 1;
+    string plaid_institution_id = 2;
 }
 
 message LinkFinancialInstitutionResponse {
@@ -19,7 +19,7 @@ message LinkFinancialInstitutionResponse {
 } 
 
 message UpdateFinancialInstitutionRequest {
-    int64 item_id = 2;
+    int64 item_id = 1;
 }
 
 message UpdateFinancialInstitutionResponse {
@@ -27,7 +27,7 @@ message UpdateFinancialInstitutionResponse {
 }
 
 message UpdateFinancialAccountsRequest {
-    int64 item_id = 2;
+    int64 item_id = 1;
 }
 
 message UpdateFinancialAccountsResponse {
@@ -35,7 +35,7 @@ message UpdateFinancialAccountsResponse {
 }
 
 message RemoveFinancialInstitutionRequest {
-    int64 item_id = 2;
+    int64 item_id = 1;
 }
 
 message RemoveFinancialInstitutionResponse {
@@ -43,8 +43,8 @@ message RemoveFinancialInstitutionResponse {
 }
 
 message AddHistoricalFinancialTransactionsRequest {
-    int64 item_id = 2;
-    string plaid_item_id = 3;
+    int64 item_id = 1;
+    string plaid_item_id = 2;
 }
 
 message AddHistoricalFinancialTransactionsResponse {
@@ -52,8 +52,8 @@ message AddHistoricalFinancialTransactionsResponse {
 }
 
 message AddFinancialTransactionsRequest {
-    int64 item_id = 2;
-    string plaid_item_id = 3;
+    int64 item_id = 1;
+    string plaid_item_id = 2;
 }
 
 message AddFinancialTransactionsResponse {
@@ -61,8 +61,8 @@ message AddFinancialTransactionsResponse {
 }
 
 message RemoveFinancialTransactionsRequest {
-    repeated int64 transaction_ids = 2;
-    repeated string plaid_transaction_ids = 3;
+    repeated int64 transaction_ids = 1;
+    repeated string plaid_transaction_ids = 2;
 }
 
 message Empty {}

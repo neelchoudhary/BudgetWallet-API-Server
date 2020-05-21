@@ -13,7 +13,7 @@ message GetFinancialInstitutionsResponse {
 }
 
 message GetFinancialAccountsRequest {
-    int64 item_id = 2;
+    int64 item_id = 1;
 }
 
 message GetFinancialAccountsResponse {
@@ -21,9 +21,9 @@ message GetFinancialAccountsResponse {
 }
 
 message ToggleFinancialAccountRequest {
-    int64 item_id = 2;
-    int64 account_id = 3;
-    bool selected = 4;
+    int64 item_id = 1;
+    int64 account_id = 2;
+    bool selected = 3;
 }
 
 message ToggleFinancialAccountResponse {
@@ -31,7 +31,7 @@ message ToggleFinancialAccountResponse {
 }
 
 message GetFinancialTransactionsRequest {
-    int64 item_id = 2;
+    int64 item_id = 1;
 }
 
 message GetFinancialTransactionsResponse {

@@ -16,8 +16,12 @@ run-server: ## run the grpc server locally
 	./cmd/scripts/run-server-local.sh
 
 .PHONY: run-client 
-run-client: ## connect to the local client
+run-client: ## connect to the local client and local servers
 	./cmd/scripts/run-client-local.sh
+
+.PHONY: run-client-prd
+run-client-prd: ## connect to the local client and prd server
+	./cmd/scripts/run-client-prd.sh
 
 .PHONY: run-auth-client-prd 
 run-auth-client-prd: ## connect to the prd auth client

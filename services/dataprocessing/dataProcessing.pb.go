@@ -28,9 +28,10 @@ type AccountDailySnapshot struct {
 	ItemId               int64    `protobuf:"varint,1,opt,name=item_id,json=itemId,proto3" json:"item_id,omitempty"`
 	AccountId            int64    `protobuf:"varint,2,opt,name=account_id,json=accountId,proto3" json:"account_id,omitempty"`
 	Date                 string   `protobuf:"bytes,3,opt,name=date,proto3" json:"date,omitempty"`
-	Balance              float64  `protobuf:"fixed64,4,opt,name=balance,proto3" json:"balance,omitempty"`
-	CashOut              float64  `protobuf:"fixed64,5,opt,name=cash_out,json=cashOut,proto3" json:"cash_out,omitempty"`
-	CashIn               float64  `protobuf:"fixed64,6,opt,name=cash_in,json=cashIn,proto3" json:"cash_in,omitempty"`
+	StartDayBalance      float64  `protobuf:"fixed64,4,opt,name=start_day_balance,json=startDayBalance,proto3" json:"start_day_balance,omitempty"`
+	EndDayBalance        float64  `protobuf:"fixed64,5,opt,name=end_day_balance,json=endDayBalance,proto3" json:"end_day_balance,omitempty"`
+	CashOut              float64  `protobuf:"fixed64,6,opt,name=cash_out,json=cashOut,proto3" json:"cash_out,omitempty"`
+	CashIn               float64  `protobuf:"fixed64,7,opt,name=cash_in,json=cashIn,proto3" json:"cash_in,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -82,9 +83,16 @@ func (m *AccountDailySnapshot) GetDate() string {
 	return ""
 }
 
-func (m *AccountDailySnapshot) GetBalance() float64 {
+func (m *AccountDailySnapshot) GetStartDayBalance() float64 {
 	if m != nil {
-		return m.Balance
+		return m.StartDayBalance
+	}
+	return 0
+}
+
+func (m *AccountDailySnapshot) GetEndDayBalance() float64 {
+	if m != nil {
+		return m.EndDayBalance
 	}
 	return 0
 }
@@ -103,9 +111,96 @@ func (m *AccountDailySnapshot) GetCashIn() float64 {
 	return 0
 }
 
+type AccountMonthlySnapshot struct {
+	ItemId               int64    `protobuf:"varint,1,opt,name=item_id,json=itemId,proto3" json:"item_id,omitempty"`
+	AccountId            int64    `protobuf:"varint,2,opt,name=account_id,json=accountId,proto3" json:"account_id,omitempty"`
+	Date                 string   `protobuf:"bytes,3,opt,name=date,proto3" json:"date,omitempty"`
+	StartMonthBalance    float64  `protobuf:"fixed64,4,opt,name=start_month_balance,json=startMonthBalance,proto3" json:"start_month_balance,omitempty"`
+	EndMonthBalance      float64  `protobuf:"fixed64,5,opt,name=end_month_balance,json=endMonthBalance,proto3" json:"end_month_balance,omitempty"`
+	CashOut              float64  `protobuf:"fixed64,6,opt,name=cash_out,json=cashOut,proto3" json:"cash_out,omitempty"`
+	CashIn               float64  `protobuf:"fixed64,7,opt,name=cash_in,json=cashIn,proto3" json:"cash_in,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *AccountMonthlySnapshot) Reset()         { *m = AccountMonthlySnapshot{} }
+func (m *AccountMonthlySnapshot) String() string { return proto.CompactTextString(m) }
+func (*AccountMonthlySnapshot) ProtoMessage()    {}
+func (*AccountMonthlySnapshot) Descriptor() ([]byte, []int) {
+	return fileDescriptor_0a5d0ea3f8dbe2a8, []int{1}
+}
+
+func (m *AccountMonthlySnapshot) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_AccountMonthlySnapshot.Unmarshal(m, b)
+}
+func (m *AccountMonthlySnapshot) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_AccountMonthlySnapshot.Marshal(b, m, deterministic)
+}
+func (m *AccountMonthlySnapshot) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_AccountMonthlySnapshot.Merge(m, src)
+}
+func (m *AccountMonthlySnapshot) XXX_Size() int {
+	return xxx_messageInfo_AccountMonthlySnapshot.Size(m)
+}
+func (m *AccountMonthlySnapshot) XXX_DiscardUnknown() {
+	xxx_messageInfo_AccountMonthlySnapshot.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_AccountMonthlySnapshot proto.InternalMessageInfo
+
+func (m *AccountMonthlySnapshot) GetItemId() int64 {
+	if m != nil {
+		return m.ItemId
+	}
+	return 0
+}
+
+func (m *AccountMonthlySnapshot) GetAccountId() int64 {
+	if m != nil {
+		return m.AccountId
+	}
+	return 0
+}
+
+func (m *AccountMonthlySnapshot) GetDate() string {
+	if m != nil {
+		return m.Date
+	}
+	return ""
+}
+
+func (m *AccountMonthlySnapshot) GetStartMonthBalance() float64 {
+	if m != nil {
+		return m.StartMonthBalance
+	}
+	return 0
+}
+
+func (m *AccountMonthlySnapshot) GetEndMonthBalance() float64 {
+	if m != nil {
+		return m.EndMonthBalance
+	}
+	return 0
+}
+
+func (m *AccountMonthlySnapshot) GetCashOut() float64 {
+	if m != nil {
+		return m.CashOut
+	}
+	return 0
+}
+
+func (m *AccountMonthlySnapshot) GetCashIn() float64 {
+	if m != nil {
+		return m.CashIn
+	}
+	return 0
+}
+
 type GetAccountDailySnapshotsRequest struct {
-	ItemId               int64    `protobuf:"varint,2,opt,name=item_id,json=itemId,proto3" json:"item_id,omitempty"`
-	AccountId            int64    `protobuf:"varint,3,opt,name=account_id,json=accountId,proto3" json:"account_id,omitempty"`
+	ItemId               int64    `protobuf:"varint,1,opt,name=item_id,json=itemId,proto3" json:"item_id,omitempty"`
+	AccountId            int64    `protobuf:"varint,2,opt,name=account_id,json=accountId,proto3" json:"account_id,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -115,7 +210,7 @@ func (m *GetAccountDailySnapshotsRequest) Reset()         { *m = GetAccountDaily
 func (m *GetAccountDailySnapshotsRequest) String() string { return proto.CompactTextString(m) }
 func (*GetAccountDailySnapshotsRequest) ProtoMessage()    {}
 func (*GetAccountDailySnapshotsRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_0a5d0ea3f8dbe2a8, []int{1}
+	return fileDescriptor_0a5d0ea3f8dbe2a8, []int{2}
 }
 
 func (m *GetAccountDailySnapshotsRequest) XXX_Unmarshal(b []byte) error {
@@ -161,7 +256,7 @@ func (m *GetAccountDailySnapshotsResponse) Reset()         { *m = GetAccountDail
 func (m *GetAccountDailySnapshotsResponse) String() string { return proto.CompactTextString(m) }
 func (*GetAccountDailySnapshotsResponse) ProtoMessage()    {}
 func (*GetAccountDailySnapshotsResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_0a5d0ea3f8dbe2a8, []int{2}
+	return fileDescriptor_0a5d0ea3f8dbe2a8, []int{3}
 }
 
 func (m *GetAccountDailySnapshotsResponse) XXX_Unmarshal(b []byte) error {
@@ -189,6 +284,92 @@ func (m *GetAccountDailySnapshotsResponse) GetAccountDailySnapshots() []*Account
 	return nil
 }
 
+type GetAccountMonthlySnapshotsRequest struct {
+	ItemId               int64    `protobuf:"varint,1,opt,name=item_id,json=itemId,proto3" json:"item_id,omitempty"`
+	AccountId            int64    `protobuf:"varint,2,opt,name=account_id,json=accountId,proto3" json:"account_id,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *GetAccountMonthlySnapshotsRequest) Reset()         { *m = GetAccountMonthlySnapshotsRequest{} }
+func (m *GetAccountMonthlySnapshotsRequest) String() string { return proto.CompactTextString(m) }
+func (*GetAccountMonthlySnapshotsRequest) ProtoMessage()    {}
+func (*GetAccountMonthlySnapshotsRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_0a5d0ea3f8dbe2a8, []int{4}
+}
+
+func (m *GetAccountMonthlySnapshotsRequest) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_GetAccountMonthlySnapshotsRequest.Unmarshal(m, b)
+}
+func (m *GetAccountMonthlySnapshotsRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_GetAccountMonthlySnapshotsRequest.Marshal(b, m, deterministic)
+}
+func (m *GetAccountMonthlySnapshotsRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_GetAccountMonthlySnapshotsRequest.Merge(m, src)
+}
+func (m *GetAccountMonthlySnapshotsRequest) XXX_Size() int {
+	return xxx_messageInfo_GetAccountMonthlySnapshotsRequest.Size(m)
+}
+func (m *GetAccountMonthlySnapshotsRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_GetAccountMonthlySnapshotsRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_GetAccountMonthlySnapshotsRequest proto.InternalMessageInfo
+
+func (m *GetAccountMonthlySnapshotsRequest) GetItemId() int64 {
+	if m != nil {
+		return m.ItemId
+	}
+	return 0
+}
+
+func (m *GetAccountMonthlySnapshotsRequest) GetAccountId() int64 {
+	if m != nil {
+		return m.AccountId
+	}
+	return 0
+}
+
+type GetAccountMonthlySnapshotsResponse struct {
+	AccountMonthlySnapshots []*AccountMonthlySnapshot `protobuf:"bytes,1,rep,name=account_monthly_snapshots,json=accountMonthlySnapshots,proto3" json:"account_monthly_snapshots,omitempty"`
+	XXX_NoUnkeyedLiteral    struct{}                  `json:"-"`
+	XXX_unrecognized        []byte                    `json:"-"`
+	XXX_sizecache           int32                     `json:"-"`
+}
+
+func (m *GetAccountMonthlySnapshotsResponse) Reset()         { *m = GetAccountMonthlySnapshotsResponse{} }
+func (m *GetAccountMonthlySnapshotsResponse) String() string { return proto.CompactTextString(m) }
+func (*GetAccountMonthlySnapshotsResponse) ProtoMessage()    {}
+func (*GetAccountMonthlySnapshotsResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_0a5d0ea3f8dbe2a8, []int{5}
+}
+
+func (m *GetAccountMonthlySnapshotsResponse) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_GetAccountMonthlySnapshotsResponse.Unmarshal(m, b)
+}
+func (m *GetAccountMonthlySnapshotsResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_GetAccountMonthlySnapshotsResponse.Marshal(b, m, deterministic)
+}
+func (m *GetAccountMonthlySnapshotsResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_GetAccountMonthlySnapshotsResponse.Merge(m, src)
+}
+func (m *GetAccountMonthlySnapshotsResponse) XXX_Size() int {
+	return xxx_messageInfo_GetAccountMonthlySnapshotsResponse.Size(m)
+}
+func (m *GetAccountMonthlySnapshotsResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_GetAccountMonthlySnapshotsResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_GetAccountMonthlySnapshotsResponse proto.InternalMessageInfo
+
+func (m *GetAccountMonthlySnapshotsResponse) GetAccountMonthlySnapshots() []*AccountMonthlySnapshot {
+	if m != nil {
+		return m.AccountMonthlySnapshots
+	}
+	return nil
+}
+
 type Empty struct {
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
@@ -199,7 +380,7 @@ func (m *Empty) Reset()         { *m = Empty{} }
 func (m *Empty) String() string { return proto.CompactTextString(m) }
 func (*Empty) ProtoMessage()    {}
 func (*Empty) Descriptor() ([]byte, []int) {
-	return fileDescriptor_0a5d0ea3f8dbe2a8, []int{3}
+	return fileDescriptor_0a5d0ea3f8dbe2a8, []int{6}
 }
 
 func (m *Empty) XXX_Unmarshal(b []byte) error {
@@ -222,8 +403,11 @@ var xxx_messageInfo_Empty proto.InternalMessageInfo
 
 func init() {
 	proto.RegisterType((*AccountDailySnapshot)(nil), "dataprocessing.AccountDailySnapshot")
+	proto.RegisterType((*AccountMonthlySnapshot)(nil), "dataprocessing.AccountMonthlySnapshot")
 	proto.RegisterType((*GetAccountDailySnapshotsRequest)(nil), "dataprocessing.GetAccountDailySnapshotsRequest")
 	proto.RegisterType((*GetAccountDailySnapshotsResponse)(nil), "dataprocessing.GetAccountDailySnapshotsResponse")
+	proto.RegisterType((*GetAccountMonthlySnapshotsRequest)(nil), "dataprocessing.GetAccountMonthlySnapshotsRequest")
+	proto.RegisterType((*GetAccountMonthlySnapshotsResponse)(nil), "dataprocessing.GetAccountMonthlySnapshotsResponse")
 	proto.RegisterType((*Empty)(nil), "dataprocessing.Empty")
 }
 
@@ -232,30 +416,38 @@ func init() {
 }
 
 var fileDescriptor_0a5d0ea3f8dbe2a8 = []byte{
-	// 360 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x8c, 0x92, 0xdf, 0x4a, 0xe3, 0x40,
-	0x14, 0xc6, 0x77, 0x9a, 0x36, 0xdd, 0xce, 0xc2, 0x5e, 0x0c, 0x5b, 0x3a, 0xbb, 0xb0, 0x6c, 0x08,
-	0x7b, 0x91, 0x0b, 0x9b, 0x48, 0x7d, 0x02, 0xa5, 0xa2, 0xf5, 0x46, 0x49, 0xaf, 0x14, 0xa1, 0x4c,
-	0x66, 0x0e, 0xcd, 0x40, 0x3a, 0x13, 0x33, 0x13, 0xa5, 0x57, 0xfa, 0x18, 0x3e, 0x86, 0x8f, 0x28,
-	0x49, 0xac, 0x90, 0xd2, 0xaa, 0x77, 0xf9, 0xf2, 0x9d, 0x3f, 0xbf, 0x39, 0xe7, 0xe0, 0x03, 0x03,
-	0xc5, 0xbd, 0xe4, 0x60, 0x22, 0xc1, 0x2c, 0xcb, 0x0b, 0xcd, 0xc1, 0x18, 0xa9, 0x96, 0xb5, 0xbc,
-	0x7a, 0x97, 0x61, 0x5e, 0x68, 0xab, 0xc9, 0xcf, 0x76, 0x90, 0xff, 0x82, 0xf0, 0xaf, 0x63, 0xce,
-	0x75, 0xa9, 0xec, 0x94, 0xc9, 0x6c, 0x3d, 0x57, 0x2c, 0x37, 0xa9, 0xb6, 0x64, 0x84, 0xfb, 0xd2,
-	0xc2, 0x6a, 0x21, 0x05, 0x45, 0x1e, 0x0a, 0x9c, 0xd8, 0xad, 0xe4, 0x4c, 0x90, 0xbf, 0x18, 0xb3,
-	0x26, 0xa1, 0xf2, 0x3a, 0xb5, 0x37, 0x78, 0xfb, 0x33, 0x13, 0x84, 0xe0, 0xae, 0x60, 0x16, 0xa8,
-	0xe3, 0xa1, 0x60, 0x10, 0xd7, 0xdf, 0x84, 0xe2, 0x7e, 0xc2, 0x32, 0xa6, 0x38, 0xd0, 0xae, 0x87,
-	0x02, 0x14, 0x6f, 0x24, 0xf9, 0x8d, 0xbf, 0x73, 0x66, 0xd2, 0x85, 0x2e, 0x2d, 0xed, 0x35, 0x56,
-	0xa5, 0x2f, 0xcb, 0x1a, 0xa0, 0xb6, 0xa4, 0xa2, 0x6e, 0xed, 0xb8, 0x95, 0x9c, 0x29, 0xff, 0x1a,
-	0xff, 0x3b, 0x03, 0xbb, 0x0b, 0xda, 0xc4, 0x70, 0x57, 0x82, 0x69, 0xc1, 0x77, 0x3e, 0x80, 0x77,
-	0xb6, 0xe0, 0xfd, 0x27, 0x84, 0xbd, 0xfd, 0xb5, 0x4d, 0xae, 0x95, 0x01, 0x72, 0x8b, 0x47, 0x9b,
-	0x1a, 0xa2, 0x8a, 0x58, 0x98, 0x4d, 0x08, 0x45, 0x9e, 0x13, 0xfc, 0x98, 0xfc, 0x0f, 0xdb, 0x43,
-	0x0e, 0x77, 0xd5, 0x8b, 0x87, 0x6c, 0x57, 0x17, 0xbf, 0x8f, 0x7b, 0xa7, 0xab, 0xdc, 0xae, 0x27,
-	0xcf, 0x08, 0x0f, 0xa7, 0xad, 0x15, 0xce, 0x9b, 0x45, 0x93, 0x47, 0x4c, 0xf7, 0x41, 0x92, 0x68,
-	0xbb, 0xf7, 0x27, 0xa3, 0xfa, 0x73, 0xf8, 0xf5, 0x84, 0xe6, 0xfd, 0xfe, 0xb7, 0x93, 0x8b, 0x9b,
-	0xf3, 0xa5, 0xb4, 0x69, 0x99, 0x84, 0x5c, 0xaf, 0x22, 0x05, 0x90, 0xf1, 0x54, 0x97, 0x22, 0x65,
-	0xc5, 0x3a, 0x4a, 0x4a, 0xb1, 0x04, 0xfb, 0xc0, 0xb2, 0x0c, 0xec, 0x98, 0xe5, 0x72, 0x5c, 0x9d,
-	0x27, 0x14, 0xd1, 0x9e, 0x2b, 0x4d, 0xdc, 0xfa, 0x2e, 0x8f, 0x5e, 0x03, 0x00, 0x00, 0xff, 0xff,
-	0xa4, 0x2b, 0x64, 0xe8, 0xc7, 0x02, 0x00, 0x00,
+	// 492 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xb4, 0x94, 0xdd, 0x6a, 0xd4, 0x40,
+	0x14, 0xc7, 0x9d, 0x6e, 0xbb, 0x6b, 0x8f, 0x68, 0xe9, 0x68, 0x6d, 0xba, 0x20, 0xc6, 0x20, 0x25,
+	0x14, 0x9b, 0xe8, 0xfa, 0x04, 0x96, 0x15, 0x5d, 0x41, 0x94, 0xf4, 0xca, 0x0f, 0x08, 0x93, 0xcc,
+	0xb0, 0x09, 0x24, 0x33, 0x31, 0x33, 0x51, 0x72, 0xa5, 0x37, 0x82, 0x8f, 0xe1, 0xf3, 0x79, 0xed,
+	0x03, 0xc8, 0x4c, 0x36, 0x6a, 0xe2, 0xc6, 0x8f, 0x4a, 0xef, 0xf6, 0xe4, 0xfc, 0xe7, 0x7f, 0xe6,
+	0x77, 0xce, 0xec, 0x81, 0x3b, 0x92, 0x95, 0x6f, 0xd3, 0x98, 0x49, 0x9f, 0x12, 0x45, 0x8a, 0x52,
+	0xc4, 0x4c, 0xca, 0x94, 0x2f, 0x4d, 0xf8, 0xfc, 0x7b, 0xe8, 0x15, 0xa5, 0x50, 0x02, 0x5f, 0xe9,
+	0x8a, 0x9c, 0x2f, 0x08, 0xae, 0x3d, 0x88, 0x63, 0x51, 0x71, 0x35, 0x27, 0x69, 0x56, 0x9f, 0x72,
+	0x52, 0xc8, 0x44, 0x28, 0xbc, 0x0f, 0x93, 0x54, 0xb1, 0x3c, 0x4c, 0xa9, 0x85, 0x6c, 0xe4, 0x8e,
+	0x82, 0xb1, 0x0e, 0x17, 0x14, 0xdf, 0x00, 0x20, 0xcd, 0x01, 0x9d, 0xdb, 0x30, 0xb9, 0xed, 0xd5,
+	0x97, 0x05, 0xc5, 0x18, 0x36, 0x29, 0x51, 0xcc, 0x1a, 0xd9, 0xc8, 0xdd, 0x0e, 0xcc, 0x6f, 0x7c,
+	0x04, 0xbb, 0x52, 0x91, 0x52, 0x85, 0x94, 0xd4, 0x61, 0x44, 0x32, 0xc2, 0x63, 0x66, 0x6d, 0xda,
+	0xc8, 0x45, 0xc1, 0x8e, 0x49, 0xcc, 0x49, 0x7d, 0xd2, 0x7c, 0xc6, 0x87, 0xb0, 0xc3, 0x38, 0xed,
+	0x28, 0xb7, 0x8c, 0xf2, 0x32, 0xe3, 0xf4, 0x27, 0xdd, 0x01, 0x5c, 0x8c, 0x89, 0x4c, 0x42, 0x51,
+	0x29, 0x6b, 0x6c, 0x04, 0x13, 0x1d, 0x3f, 0xab, 0xcc, 0xd5, 0x4d, 0x2a, 0xe5, 0xd6, 0xc4, 0x64,
+	0xc6, 0x3a, 0x5c, 0x70, 0xe7, 0x2b, 0x82, 0xeb, 0x2b, 0xd8, 0xa7, 0x82, 0xab, 0xe4, 0x9c, 0x70,
+	0x3d, 0xb8, 0xda, 0xe0, 0xe6, 0xba, 0x48, 0x0f, 0xb8, 0xe9, 0x84, 0x29, 0xdf, 0xa2, 0x1c, 0xc1,
+	0xae, 0x46, 0xee, 0xaa, 0x1b, 0x68, 0xdd, 0x8b, 0x8e, 0xf6, 0x2c, 0xd8, 0x2f, 0xe0, 0xe6, 0x23,
+	0xa6, 0xd6, 0x4d, 0x59, 0x06, 0xec, 0x4d, 0xc5, 0xe4, 0x99, 0xf1, 0x9d, 0x0f, 0x08, 0xec, 0x61,
+	0x6f, 0x59, 0x08, 0x2e, 0x19, 0x7e, 0x0d, 0xfb, 0xad, 0x07, 0xd5, 0x8a, 0x50, 0xb6, 0x12, 0x0b,
+	0xd9, 0x23, 0xf7, 0xd2, 0xec, 0xb6, 0xd7, 0x7d, 0x95, 0xde, 0x3a, 0xbf, 0x60, 0x8f, 0xac, 0xab,
+	0xe2, 0xbc, 0x82, 0x5b, 0x3f, 0x6e, 0xd0, 0x1b, 0xeb, 0x7f, 0xf3, 0x7d, 0x42, 0xe0, 0xfc, 0xce,
+	0x7d, 0x45, 0x18, 0xc1, 0x41, 0xeb, 0x92, 0x37, 0x9a, 0x5f, 0x18, 0x0f, 0x07, 0x18, 0x7b, 0x9e,
+	0x41, 0xdb, 0xaa, 0x7e, 0x2d, 0x67, 0x02, 0x5b, 0x0f, 0xf3, 0x42, 0xd5, 0xb3, 0xcf, 0x1b, 0xb0,
+	0x37, 0xef, 0xfc, 0xb7, 0x4f, 0x9b, 0x0d, 0x80, 0xdf, 0x83, 0x35, 0x34, 0x0c, 0xec, 0xf7, 0xeb,
+	0xff, 0xe1, 0x49, 0x4c, 0xef, 0xfe, 0xfd, 0x81, 0xa6, 0x0b, 0xce, 0x05, 0xfc, 0x11, 0xc1, 0x74,
+	0xb8, 0x5d, 0xf8, 0xde, 0xb0, 0xe5, 0xc0, 0xe0, 0xa6, 0xb3, 0x7f, 0x39, 0xd2, 0xde, 0xe3, 0xe4,
+	0xc9, 0xcb, 0xc7, 0xcb, 0x54, 0x25, 0x55, 0xe4, 0xc5, 0x22, 0xf7, 0x39, 0x63, 0x59, 0x9c, 0x88,
+	0x8a, 0x26, 0xa4, 0xac, 0xfd, 0xa8, 0xa2, 0x4b, 0xa6, 0xde, 0x91, 0x2c, 0x63, 0xea, 0x98, 0x14,
+	0xe9, 0xb1, 0xde, 0x9f, 0xac, 0xf4, 0x07, 0xd6, 0x68, 0x34, 0x36, 0x8b, 0xf3, 0xfe, 0xb7, 0x00,
+	0x00, 0x00, 0xff, 0xff, 0x2d, 0x07, 0x50, 0x1e, 0x68, 0x05, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -271,6 +463,7 @@ const _ = grpc.SupportPackageIsVersion4
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type DataProcessingServiceClient interface {
 	GetAccountDailySnapshots(ctx context.Context, in *GetAccountDailySnapshotsRequest, opts ...grpc.CallOption) (*GetAccountDailySnapshotsResponse, error)
+	GetAccountMonthlySnapshots(ctx context.Context, in *GetAccountMonthlySnapshotsRequest, opts ...grpc.CallOption) (*GetAccountMonthlySnapshotsResponse, error)
 }
 
 type dataProcessingServiceClient struct {
@@ -290,9 +483,19 @@ func (c *dataProcessingServiceClient) GetAccountDailySnapshots(ctx context.Conte
 	return out, nil
 }
 
+func (c *dataProcessingServiceClient) GetAccountMonthlySnapshots(ctx context.Context, in *GetAccountMonthlySnapshotsRequest, opts ...grpc.CallOption) (*GetAccountMonthlySnapshotsResponse, error) {
+	out := new(GetAccountMonthlySnapshotsResponse)
+	err := c.cc.Invoke(ctx, "/dataprocessing.DataProcessingService/GetAccountMonthlySnapshots", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // DataProcessingServiceServer is the server API for DataProcessingService service.
 type DataProcessingServiceServer interface {
 	GetAccountDailySnapshots(context.Context, *GetAccountDailySnapshotsRequest) (*GetAccountDailySnapshotsResponse, error)
+	GetAccountMonthlySnapshots(context.Context, *GetAccountMonthlySnapshotsRequest) (*GetAccountMonthlySnapshotsResponse, error)
 }
 
 // UnimplementedDataProcessingServiceServer can be embedded to have forward compatible implementations.
@@ -301,6 +504,9 @@ type UnimplementedDataProcessingServiceServer struct {
 
 func (*UnimplementedDataProcessingServiceServer) GetAccountDailySnapshots(ctx context.Context, req *GetAccountDailySnapshotsRequest) (*GetAccountDailySnapshotsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetAccountDailySnapshots not implemented")
+}
+func (*UnimplementedDataProcessingServiceServer) GetAccountMonthlySnapshots(ctx context.Context, req *GetAccountMonthlySnapshotsRequest) (*GetAccountMonthlySnapshotsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetAccountMonthlySnapshots not implemented")
 }
 
 func RegisterDataProcessingServiceServer(s *grpc.Server, srv DataProcessingServiceServer) {
@@ -325,6 +531,24 @@ func _DataProcessingService_GetAccountDailySnapshots_Handler(srv interface{}, ct
 	return interceptor(ctx, in, info, handler)
 }
 
+func _DataProcessingService_GetAccountMonthlySnapshots_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetAccountMonthlySnapshotsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DataProcessingServiceServer).GetAccountMonthlySnapshots(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/dataprocessing.DataProcessingService/GetAccountMonthlySnapshots",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DataProcessingServiceServer).GetAccountMonthlySnapshots(ctx, req.(*GetAccountMonthlySnapshotsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 var _DataProcessingService_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "dataprocessing.DataProcessingService",
 	HandlerType: (*DataProcessingServiceServer)(nil),
@@ -332,6 +556,10 @@ var _DataProcessingService_serviceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetAccountDailySnapshots",
 			Handler:    _DataProcessingService_GetAccountDailySnapshots_Handler,
+		},
+		{
+			MethodName: "GetAccountMonthlySnapshots",
+			Handler:    _DataProcessingService_GetAccountMonthlySnapshots_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
