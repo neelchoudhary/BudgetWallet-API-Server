@@ -62,7 +62,7 @@ func (r *FinancialCategoryRepository) GetFinancialCategoryIDByPlaidID(tx *sql.Tx
 	}
 
 	err = tx.QueryRow("SELECT category_id FROM category_mapping WHERE plaid_category_id=$1;",
-		plaidCategoryID[:len(plaidCategoryID)-5]).Scan(&categoryID)
+		plaidCategoryID[:len(plaidCategoryID)-6]).Scan(&categoryID)
 	if err != nil {
 		if err != sql.ErrNoRows {
 			return 0, err
@@ -71,5 +71,5 @@ func (r *FinancialCategoryRepository) GetFinancialCategoryIDByPlaidID(tx *sql.Tx
 		return categoryID, nil
 	}
 	// Return empty category (18)
-	return 18, nil
+	return 57, nil
 }

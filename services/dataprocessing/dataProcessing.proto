@@ -46,4 +46,7 @@ message Empty {}
 service DataProcessingService {
     rpc GetAccountDailySnapshots(GetAccountDailySnapshotsRequest) returns (GetAccountDailySnapshotsResponse) {};
     rpc GetAccountMonthlySnapshots(GetAccountMonthlySnapshotsRequest) returns (GetAccountMonthlySnapshotsResponse) {};
+    // get estimated monthly income
+    // get monthly savings
+    // get category spending/saving
 }

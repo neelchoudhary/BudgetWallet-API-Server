@@ -107,7 +107,6 @@ func (i *FinancialItem) getFinancialTransactionsFromPlaidWithPagination(offset i
 
 	// Convert plaid transactions to financial transactions
 	for _, plaidTransaction := range res.Transactions {
-		// ! need to provide proper account & category id
 		transaction := NewFinancialTransactionFromPlaid(i.UserID, i.ID, plaidTransaction)
 		*transactions = append(*transactions, transaction)
 	}
