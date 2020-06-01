@@ -6,6 +6,7 @@ import (
 	"net"
 
 	"github.com/neelchoudhary/budgetwallet-api-server/services/dataprocessing"
+	"github.com/neelchoudhary/budgetwallet-api-server/services/webhooks"
 
 	"github.com/neelchoudhary/budgetwallet-api-server/services/financialcategories"
 
@@ -27,16 +28,20 @@ type Server struct {
 	plaidFinancesService       *plaidfinances.PlaidFinancesServiceServer
 	financialCategoriesService *financialcategories.FinancialCategoryServiceServer
 	dataProcessingService      *dataprocessing.DataProcessingServiceServer
+	webhooksService            *webhooks.WebhooksServiceServer
 }
 
 // NewServer construct a new server with service dependencies
-func NewServer(serverConfig *config.ServerConfig,
+func NewServer(
+	serverConfig *config.ServerConfig,
 	jwtManager *utils.JWTManager,
 	authService *auth.AuthServiceServer,
 	userFinancesService *userfinances.UserFinancesServiceServer,
 	plaidFinancesService *plaidfinances.PlaidFinancesServiceServer,
 	financialCategoriesService *financialcategories.FinancialCategoryServiceServer,
-	dataProcessingService *dataprocessing.DataProcessingServiceServer) *Server {
+	dataProcessingService *dataprocessing.DataProcessingServiceServer,
+	webhooksService *webhooks.WebhooksServiceServer,
+) *Server {
 	return &Server{
 		serverConfig:               serverConfig,
 		jwtManager:                 jwtManager,
@@ -45,6 +50,7 @@ func NewServer(serverConfig *config.ServerConfig,
 		plaidFinancesService:       plaidFinancesService,
 		financialCategoriesService: financialCategoriesService,
 		dataProcessingService:      dataProcessingService,
+		webhooksService:            webhooksService,
 	}
 }
 
@@ -76,6 +82,7 @@ func (s *Server) runGRPCServer() error {
 	plaidfinances.RegisterPlaidFinancesServiceServer(grpcServer, *s.plaidFinancesService)
 	financialcategories.RegisterFinancialCategoryServiceServer(grpcServer, *s.financialCategoriesService)
 	dataprocessing.RegisterDataProcessingServiceServer(grpcServer, *s.dataProcessingService)
+	webhooks.RegisterWebhooksServiceServer(grpcServer, *s.webhooksService)
 
 	// Start gRPC server
 	log.Println("starting gRPC server...")

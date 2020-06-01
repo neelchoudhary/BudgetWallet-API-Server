@@ -156,6 +156,22 @@ func (i *FinancialItem) RemoveItemFromPlaid(plaidClient *plaid.Client) error {
 	return nil
 }
 
+// GetItemWebhookFromPlaid calls Plaid api to get webhook for item
+func (i *FinancialItem) GetItemWebhookFromPlaid(plaidClient *plaid.Client) (string, error) {
+	itemResponse, err := plaidClient.GetItem(i.PlaidAccessToken)
+	if err != nil {
+		return "", err
+	}
+	webhook := itemResponse.Item.Webhook
+	return webhook, nil
+}
+
+// UpdateItemWebhookFromPlaid calls Plaid api to update webhook for item
+func (i *FinancialItem) UpdateItemWebhookFromPlaid(plaidClient *plaid.Client, webhook string) error {
+	_, err := plaidClient.UpdateItemWebhook(i.PlaidAccessToken, webhook)
+	return err
+}
+
 // FinancialItemRepository interface
 type FinancialItemRepository interface {
 	AddItem(tx *sql.Tx, item *FinancialItem) error

@@ -249,6 +249,9 @@ func (s *Service) AddHistoricalFinancialTransactions(ctx context.Context, req *A
 		logger("AddHistoricalFinancialTransactions", err).Error(fmt.Sprintf("GetUserIDMetadata failed"))
 		return nil, utils.InternalServerError
 	}
+	if req.GetUserId() != 0 {
+		userID = req.GetUserId()
+	}
 
 	// Get item by id
 	var item *models.FinancialItem
@@ -326,6 +329,9 @@ func (s *Service) AddFinancialTransactions(ctx context.Context, req *AddFinancia
 		logger("AddFinancialTransactions", err).Error(fmt.Sprintf("GetUserIDMetadata failed"))
 		return nil, utils.InternalServerError
 	}
+	if req.GetUserId() != 0 {
+		userID = req.GetUserId()
+	}
 
 	// Get item by id
 	var item *models.FinancialItem
@@ -400,6 +406,9 @@ func (s *Service) RemoveFinancialTransactions(ctx context.Context, req *RemoveFi
 	if err != nil {
 		logger("RemoveFinancialTransactions", err).Error(fmt.Sprintf("GetUserIDMetadata failed"))
 		return nil, utils.InternalServerError
+	}
+	if req.GetUserId() != 0 {
+		userID = req.GetUserId()
 	}
 
 	for _, transactionID := range req.GetTransactionIds() {
