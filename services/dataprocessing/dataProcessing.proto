@@ -49,4 +49,5 @@ service DataProcessingService {
     // get estimated monthly income
     // get monthly savings
     // get category spending/saving
+    // get recurring transactions
 }
