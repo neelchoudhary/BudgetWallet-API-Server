@@ -349,7 +349,7 @@ func (s *Service) AddFinancialTransactions(ctx context.Context, req *AddFinancia
 		}
 	}
 
-	startDate := time.Now().Local().Add(time.Duration(240) * time.Hour * -1).Format("2006-01-02") // 10 days back
+	startDate := time.Now().Local().Add(time.Duration(240*3) * time.Hour * -1).Format("2006-01-02") // 10 days back
 	allTransactions, err := item.GetFinancialTransactionsFromPlaid(startDate, s.plaidClient)
 	if err != nil {
 		logger("AddFinancialTransactions", err).Error(fmt.Sprintf("Item call to GetFinancialTransactionsFromPlaid failed"))
