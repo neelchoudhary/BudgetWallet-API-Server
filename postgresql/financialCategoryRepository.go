@@ -40,6 +40,11 @@ func (r *FinancialCategoryRepository) GetFinancialCategories(tx *sql.Tx) ([]mode
 
 // GetFinancialCategoryIDByPlaidID gets financial category id by plaid category id
 func (r *FinancialCategoryRepository) GetFinancialCategoryIDByPlaidID(tx *sql.Tx, plaidCategoryID string) (int64, error) {
+
+	if plaidCategoryID == "" {
+		return 57, nil
+	}
+
 	var categoryID int64
 	err := tx.QueryRow("SELECT category_id FROM category_mapping WHERE plaid_category_id=$1;",
 		plaidCategoryID).Scan(&categoryID)
