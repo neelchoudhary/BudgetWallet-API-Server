@@ -52,6 +52,13 @@ func (s *Service) GetAccountDailySnapshots(ctx context.Context, req *GetAccountD
 		return nil, utils.InternalServerError
 	}
 
+	if len(transactions) == 0 {
+		res := &GetAccountDailySnapshotsResponse{
+			AccountDailySnapshots: nil,
+		}
+		return res, nil
+	}
+
 	// Get oldest date
 	oldestDate := transactions[len(transactions)-1].Date
 
@@ -134,6 +141,13 @@ func (s *Service) GetAccountMonthlySnapshots(ctx context.Context, req *GetAccoun
 	if err != nil {
 		logger("GetAccountMonthlySnapshots", err).Error(fmt.Sprintf("Repo call to GetAccountTransactions failed"))
 		return nil, utils.InternalServerError
+	}
+
+	if len(transactions) == 0 {
+		res := &GetAccountMonthlySnapshotsResponse{
+			AccountMonthlySnapshots: nil,
+		}
+		return res, nil
 	}
 
 	// Get oldest date
