@@ -100,7 +100,12 @@ func (s *Service) GetAccountDailySnapshots(ctx context.Context, req *GetAccountD
 			}
 		}
 		endBalance := availableBalance
-		availableBalance = availableBalance + dailyCashOut - dailyCashIn
+
+		if account.AccountType == "credit" {
+			availableBalance = availableBalance - dailyCashOut + dailyCashIn
+		} else {
+			availableBalance = availableBalance + dailyCashOut - dailyCashIn
+		}
 
 		// Insert new daily_account record with the above info for the date.
 		accountDailySnapshot := &AccountDailySnapshot{
@@ -196,7 +201,11 @@ func (s *Service) GetAccountMonthlySnapshots(ctx context.Context, req *GetAccoun
 			}
 		}
 		endBalance := availableBalance
-		availableBalance = availableBalance + monthlyCashOut - monthlyCashIn
+		if account.AccountType == "credit" {
+			availableBalance = availableBalance - monthlyCashOut + monthlyCashIn
+		} else {
+			availableBalance = availableBalance + monthlyCashOut - monthlyCashIn
+		}
 
 		// Insert new daily_account record with the above info for the date.
 		accountMonthlySnapshot := &AccountMonthlySnapshot{
