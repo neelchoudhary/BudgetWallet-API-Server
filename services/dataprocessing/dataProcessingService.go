@@ -73,6 +73,10 @@ func (s *Service) GetAccountDailySnapshots(ctx context.Context, req *GetAccountD
 	}
 	availableBalance := account.AvailableBalance
 
+	if account.AccountType == "credit" {
+		availableBalance = account.CurrentBalance
+	}
+
 	accountDailySnapshots := make([]*AccountDailySnapshot, 0)
 
 	// Loop through dates starting from current date to oldest date
@@ -166,6 +170,9 @@ func (s *Service) GetAccountMonthlySnapshots(ctx context.Context, req *GetAccoun
 	}
 	availableBalance := account.AvailableBalance
 
+	if account.AccountType == "credit" {
+		availableBalance = account.CurrentBalance
+	}
 	accountMonthlySnapshots := make([]*AccountMonthlySnapshot, 0)
 
 	// Loop through dates starting from current date to oldest date
