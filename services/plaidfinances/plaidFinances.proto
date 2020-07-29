@@ -9,6 +9,10 @@ message Category {
     string group = 3;
 }
 
+message LinkTokenResponse {
+    string linkToken = 1;
+} 
+
 message LinkFinancialInstitutionRequest {
     string public_token = 1;
     string plaid_institution_id = 2;
@@ -71,6 +75,7 @@ message RemoveFinancialTransactionsRequest {
 message Empty {}
 
 service PlaidFinancesService {
+    rpc LinkToken(Empty) returns (LinkTokenResponse) {};
     rpc LinkFinancialInstitution(LinkFinancialInstitutionRequest) returns (LinkFinancialInstitutionResponse) {};
     rpc UpdateFinancialInstitution(UpdateFinancialInstitutionRequest) returns (UpdateFinancialInstitutionResponse) {};
     rpc UpdateFinancialAccounts(UpdateFinancialAccountsRequest) returns (UpdateFinancialAccountsResponse) {};

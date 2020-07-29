@@ -3,6 +3,8 @@ package models
 import (
 	"database/sql"
 	"errors"
+	"fmt"
+	"strconv"
 	"time"
 
 	"github.com/plaid/plaid-go/plaid"
@@ -21,6 +23,26 @@ type FinancialItem struct {
 	ErrorCode          string `json:"error_message"`
 	ErrorDevMessage    string `json:"error_dev_msg"`
 	ErrorUserMessage   string `json:"error_user_msg"`
+}
+
+// LinkTokenFromPlaid ...
+func LinkTokenFromPlaid(userID int64, plaidClient *plaid.Client) (string, error) {
+	// Create link token
+	linkTokenResponse, err := plaidClient.CreateLinkToken(plaid.LinkTokenConfigs{
+		ClientName:   "BudgetWallet",
+		CountryCodes: []string{"US"},
+		Language:     "en",
+		Products:     []string{"transactions"},
+		Webhook:      fmt.Sprintf("https://neelchoudhary.com:1443/plaidwebhook/%d", userID),
+		User: &plaid.LinkTokenUser{
+			ClientUserID: strconv.FormatInt(userID, 10),
+		},
+	})
+	if err != nil {
+		return "", err
+	}
+
+	return linkTokenResponse.LinkToken, nil
 }
 
 // NewFinancialItemFromPlaid ...

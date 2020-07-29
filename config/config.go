@@ -22,9 +22,9 @@ func NewPlaidConfig(clientID string, secret string, publicKey string) *PlaidConf
 // ConnectToPlaid establishes a connection with Plaid
 func ConnectToPlaid(plaidConfig *PlaidConfig) *plaid.Client {
 	plaidClient, err := plaid.NewClient(plaid.ClientOptions{
-		ClientID:    plaidConfig.ClientID,
-		Secret:      plaidConfig.Secret,
-		PublicKey:   plaidConfig.PublicKey,
+		ClientID: plaidConfig.ClientID,
+		Secret:   plaidConfig.Secret,
+		// PublicKey:   plaidConfig.PublicKey,
 		Environment: plaid.Development,
 		HTTPClient:  &http.Client{},
 	})

@@ -41,6 +41,27 @@ func NewPlaidFinancesServer(
 	return &Service{txRepo: *txRepo, financialItemRepo: *itemRepo, financialAccountRepo: *accountRepo, financialTransactionRepo: *transactionRepo, financialCategoryRepo: *financialCategoryRepo, plaidClient: plaidClient}
 }
 
+// LinkToken returns a link token
+func (s *Service) LinkToken(ctx context.Context, req *Empty) (*LinkTokenResponse, error) {
+
+	userID, err := utils.GetUserIDMetadata(ctx)
+	if err != nil {
+		logger("LinkFinancialInstitution", err).Error(fmt.Sprintf("GetUserIDMetadata failed"))
+		return nil, utils.InternalServerError
+	}
+
+	linkToken, err := models.LinkTokenFromPlaid(userID, s.plaidClient)
+	if err != nil {
+		logger("LinkToken", err).Error(fmt.Sprintf("Item call to LinkTokenFromPlaid failed"))
+		return nil, utils.InternalServerError
+	}
+
+	res := &LinkTokenResponse{
+		LinkToken: linkToken,
+	}
+	return res, nil
+}
+
 // LinkFinancialInstitution link a new financial institution from Plaid and add item and accounts to DB
 func (s *Service) LinkFinancialInstitution(ctx context.Context, req *LinkFinancialInstitutionRequest) (*LinkFinancialInstitutionResponse, error) {
 	tx, err := s.txRepo.StartTx(ctx)
