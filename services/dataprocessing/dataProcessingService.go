@@ -232,6 +232,87 @@ func (s *Service) GetAccountMonthlySnapshots(ctx context.Context, req *GetAccoun
 	return res, nil
 }
 
+// GetCategoryMonthlySnapshots get monthly snapshots for a category
+func (s *Service) GetCategoryMonthlySnapshots(ctx context.Context, req *GetCategoryMonthlySnapshotsRequest) (*GetCategoryMonthlySnapshotsResponse, error) {
+	tx, err := s.txRepo.StartTx(ctx)
+	if err != nil {
+		logger("GetCategoryMonthlySnapshots", err).Error(utils.StartTxErrorMsg)
+		return nil, utils.InternalServerError
+	}
+
+	userID, err := utils.GetUserIDMetadata(ctx)
+	if err != nil {
+		logger("GetCategoryMonthlySnapshots", err).Error(fmt.Sprintf("GetUserIDMetadata failed"))
+		return nil, utils.InternalServerError
+	}
+
+	transactions, err := s.financialTransactionRepo.GetUserTransactions(tx, userID)
+	if err != nil {
+		logger("GetCategoryMonthlySnapshots", err).Error(fmt.Sprintf("Repo call to GetUserTransactions failed"))
+		return nil, utils.InternalServerError
+	}
+
+	if len(transactions) == 0 {
+		res := &GetCategoryMonthlySnapshotsResponse{
+			AccountMonthlySnapshots: nil,
+		}
+		return res, nil
+	}
+
+	// Get oldest date
+	oldestDate := transactions[len(transactions)-1].Date
+	oldestDateTime, _ := time.Parse("2006-01-02", oldestDate)
+	oldestDate = oldestDateTime.AddDate(0, 0, 1+(-1*oldestDateTime.Day())).Format("2006-01-02")
+
+	// Find current date
+	currentDate := time.Now().AddDate(0, 0, 1+(-1*time.Now().Day())).Format("2006-01-02")
+
+	accountMonthlySnapshots := make([]*AccountMonthlySnapshot, 0)
+
+	// Loop through dates starting from current date to oldest date
+	for date := currentDate; DateComparator(date, oldestDate); date = MonthDecrementer(date) {
+		// Get all transactions on that date => list of transactions on date
+		transactionsInMonth := make([]models.FinancialTransaction, 0)
+		for _, transaction := range transactions {
+			if WithinMonth(transaction.Date, date) {
+				if req.GetCategoryId() == transaction.CategoryID {
+					transactionsInMonth = append(transactionsInMonth, transaction)
+				}
+			}
+		}
+
+		// Loop through list of transactions on date and find balance, cash in, and cash out
+		monthlyCashOut := 0.0
+		monthlyCashIn := 0.0
+		for _, transaction := range transactionsInMonth {
+			if transaction.Amount > 0 {
+				monthlyCashOut += transaction.Amount
+			} else {
+				monthlyCashIn += (transaction.Amount * -1)
+			}
+		}
+
+		// Insert new daily_account record with the above info for the date.
+		accountMonthlySnapshot := &AccountMonthlySnapshot{
+			Date:    date,
+			CashOut: math.Round(monthlyCashOut*100) / 100,
+			CashIn:  math.Round(monthlyCashIn*100) / 100,
+		}
+		accountMonthlySnapshots = append(accountMonthlySnapshots, accountMonthlySnapshot)
+	}
+
+	err = s.txRepo.CommitTx(tx)
+	if err != nil {
+		logger("GetCategoryMonthlySnapshots", err).Error(utils.CommitTxErrorMsg)
+		return nil, err
+	}
+
+	res := &GetCategoryMonthlySnapshotsResponse{
+		AccountMonthlySnapshots: accountMonthlySnapshots,
+	}
+	return res, nil
+}
+
 // DateComparator returns true if date1 is greater than or equal to date2
 func DateComparator(date1 string, date2 string) bool {
 	// Date format: YYYY-MM-DD
