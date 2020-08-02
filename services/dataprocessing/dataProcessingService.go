@@ -109,8 +109,6 @@ func (s *Service) GetAccountDailySnapshots(ctx context.Context, req *GetAccountD
 
 		// Insert new daily_account record with the above info for the date.
 		accountDailySnapshot := &AccountDailySnapshot{
-			ItemId:          req.GetItemId(),
-			AccountId:       req.GetAccountId(),
 			Date:            date,
 			StartDayBalance: math.Round(availableBalance*100) / 100,
 			EndDayBalance:   math.Round(endBalance*100) / 100,
@@ -209,8 +207,6 @@ func (s *Service) GetAccountMonthlySnapshots(ctx context.Context, req *GetAccoun
 
 		// Insert new daily_account record with the above info for the date.
 		accountMonthlySnapshot := &AccountMonthlySnapshot{
-			ItemId:            req.GetItemId(),
-			AccountId:         req.GetAccountId(),
 			Date:              date,
 			StartMonthBalance: math.Round(availableBalance*100) / 100,
 			EndMonthBalance:   math.Round(endBalance*100) / 100,
