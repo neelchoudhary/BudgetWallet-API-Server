@@ -30,8 +30,7 @@ message ToggleFinancialAccountResponse {
     bool success = 1;
 }
 
-message GetFinancialTransactionsRequest {
-    int64 item_id = 1;
+message Empty {
 }
 
 message GetFinancialTransactionsResponse {
@@ -42,5 +41,5 @@ service UserFinancesService {
     rpc GetFinancialInstitutions(GetFinancialInstitutionsRequest) returns (GetFinancialInstitutionsResponse) {};
     rpc GetFinancialAccounts(GetFinancialAccountsRequest) returns (GetFinancialAccountsResponse) {};
     rpc ToggleFinancialAccount(ToggleFinancialAccountRequest) returns (ToggleFinancialAccountResponse) {};
-    rpc GetFinancialTransactions(GetFinancialTransactionsRequest) returns (GetFinancialTransactionsResponse) {};
+    rpc GetFinancialTransactions(Empty) returns (GetFinancialTransactionsResponse) {};
 }

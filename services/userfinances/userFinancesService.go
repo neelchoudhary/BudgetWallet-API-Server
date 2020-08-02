@@ -143,8 +143,8 @@ func (s *Service) ToggleFinancialAccount(ctx context.Context, req *ToggleFinanci
 	return res, nil
 }
 
-// GetFinancialTransactions get all transactions for a user's item
-func (s *Service) GetFinancialTransactions(ctx context.Context, req *GetFinancialTransactionsRequest) (*GetFinancialTransactionsResponse, error) {
+// GetFinancialTransactions get all transactions for a user
+func (s *Service) GetFinancialTransactions(ctx context.Context, req *Empty) (*GetFinancialTransactionsResponse, error) {
 	tx, err := s.txRepo.StartTx(ctx)
 	if err != nil {
 		logger("GetFinancialTransactions", err).Error(utils.StartTxErrorMsg)
@@ -157,9 +157,9 @@ func (s *Service) GetFinancialTransactions(ctx context.Context, req *GetFinancia
 		return nil, utils.InternalServerError
 	}
 
-	transactions, err := s.financialTransactionRepo.GetItemTransactions(tx, userID, req.ItemId)
+	transactions, err := s.financialTransactionRepo.GetUserTransactions(tx, userID)
 	if err != nil {
-		logger("GetFinancialTransactions", err).Error(fmt.Sprintf("Repo call to GetItemTransactions failed"))
+		logger("GetFinancialTransactions", err).Error(fmt.Sprintf("Repo call to GetUserTransactions failed"))
 		return nil, utils.InternalServerError
 	}
 	var pbTransactions []*shared.FinancialTransaction
