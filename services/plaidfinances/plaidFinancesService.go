@@ -2,6 +2,7 @@ package plaidfinances
 
 import (
 	context "context"
+	"database/sql"
 	fmt "fmt"
 	"time"
 
@@ -180,7 +181,14 @@ func (s *Service) UpdateFinancialAccounts(ctx context.Context, req *UpdateFinanc
 	}
 	for _, plaidAccount := range plaidResponse.Accounts {
 		account, err := s.financialAccountRepo.GetAccountByPlaidID(tx, userID, plaidAccount.AccountID)
-		if err != nil {
+		if err != nil && err == sql.ErrNoRows {
+			// there is a new account - add to db
+			err := s.financialAccountRepo.AddAccount(tx, account)
+			if err != nil {
+				logger("UpdateFinancialAccounts", err).Error(fmt.Sprintf("Repo call to AddAccount failed"))
+				return nil, utils.InternalServerError
+			}
+		} else if err != nil {
 			logger("UpdateFinancialAccounts", err).Error(fmt.Sprintf("Repo call to GetAccountByPlaidID failed"))
 			return nil, utils.InternalServerError
 		}

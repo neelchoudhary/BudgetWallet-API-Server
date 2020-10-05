@@ -18,7 +18,7 @@ type FinancialTransaction struct {
 	PlaidAccountID           string  `json:"plaid_account_id"`
 	PlaidCategoryID          string  `json:"plaid_category_id"`
 	PlaidTransactionID       string  `json:"plaid_transaction_id"`
-	Name                     string  `json:"name"`
+	Name                     string  `json:"transaction_name"`
 	Amount                   float64 `json:"amount"`
 	Date                     string  `json:"date"`
 	Pending                  bool    `json:"pending"`

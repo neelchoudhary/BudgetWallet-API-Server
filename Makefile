@@ -50,7 +50,7 @@ migrate-force: ## force migration
 .PHONY: migrate-new
 migrate-new: ## create a new database migration
 	@read -p "Enter the name of the new migration: " name; \
-	$(MIGRATE) create -ext sql -dir db/migrations -seq $${name// /_}
+	$(MIGRATE) create -ext sql -dir postgresql/migrations -seq $${name// /_}
 
 .PHONY: migrate-reset
 migrate-reset: ## reset database and re-run all migrations

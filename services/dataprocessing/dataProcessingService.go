@@ -1,9 +1,13 @@
 package dataprocessing
 
 import (
+	"bytes"
 	context "context"
+	"encoding/json"
 	fmt "fmt"
+	"io/ioutil"
 	math "math"
+	"net/http"
 	"strings"
 	"time"
 
@@ -366,4 +370,168 @@ func MonthDecrementer(date string) string {
 	d, _ := time.Parse("2006-01-02", date)
 	decrementedDate := d.AddDate(0, -1, 0)
 	return decrementedDate.Format("2006-01-02")
+}
+
+// TransactionForPython ...
+type TransactionForPython struct {
+	ID                 int64   `json:"id"`
+	CategoryID         int64   `json:"category_id"`
+	PlaidCategoryID    string  `json:"plaid_category_id"`
+	PlaidTransactionID string  `json:"plaid_transaction_id"`
+	Name               string  `json:"transaction_name"`
+	Amount             float64 `json:"amount"`
+	Date               string  `json:"date"`
+}
+
+// FindRecurringTransactions add recurring transactions to db
+func (s *Service) FindRecurringTransactions(ctx context.Context, req *Empty) (*FindRecurringTransactionsResponse, error) {
+	tx, err := s.txRepo.StartTx(ctx)
+	if err != nil {
+		logger("GetRecurringTransactions", err).Error(utils.StartTxErrorMsg)
+		return nil, utils.InternalServerError
+	}
+
+	userID, err := utils.GetUserIDMetadata(ctx)
+	if err != nil {
+		logger("GetRecurringTransactions", err).Error(fmt.Sprintf("GetUserIDMetadata failed"))
+		return nil, utils.InternalServerError
+	}
+
+	transactions, err := s.financialTransactionRepo.GetUserTransactions(tx, userID)
+	if err != nil {
+		logger("GetRecurringTransactions", err).Error(fmt.Sprintf("Repo call to GetUserTransactions failed"))
+		return nil, utils.InternalServerError
+	}
+
+	if len(transactions) == 0 {
+		res := &FindRecurringTransactionsResponse{
+			Success: true,
+		}
+		return res, nil
+	}
+
+	var pythonTransactions []*TransactionForPython
+	for _, transaction := range transactions[0:200] {
+		pythonTransactions = append(pythonTransactions, dataToTransactionForPython(transaction))
+	}
+
+	var jsonData []byte
+	jsonData, err = json.Marshal(pythonTransactions)
+	if err != nil {
+		logger("GetRecurringTransactions", err).Error(fmt.Sprintf("Failed to marshal json request"))
+		return nil, utils.InternalServerError
+	}
+
+	response, err := http.Post("http://127.0.0.1:5001/recurring", "application/json", bytes.NewBuffer(jsonData))
+	if err != nil {
+		logger("GetRecurringTransactions", err).Error(fmt.Sprintf("Failed to make post call to dataprocessing server"))
+		return nil, utils.InternalServerError
+	}
+
+	responseData, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		logger("GetRecurringTransactions", err).Error(fmt.Sprintf("Failed to read response"))
+		return nil, utils.InternalServerError
+	}
+
+	var recurringTransactions []*RecurringTransaction
+	err = json.Unmarshal(responseData, &recurringTransactions)
+	if err != nil {
+		logger("GetRecurringTransactions", err).Error(fmt.Sprintf("Failed to unmarshal json response"))
+		return nil, utils.InternalServerError
+	}
+
+	err = s.txRepo.CommitTx(tx)
+	if err != nil {
+		logger("GetRecurringTransactions", err).Error(utils.CommitTxErrorMsg)
+		return nil, err
+	}
+
+	res := &FindRecurringTransactionsResponse{
+		Success: true,
+	}
+	return res, nil
+}
+
+// GetRecurringTransactions get monthly snapshots for a category
+func (s *Service) GetRecurringTransactions(ctx context.Context, req *Empty) (*GetRecurringTransactionsResponse, error) {
+	tx, err := s.txRepo.StartTx(ctx)
+	if err != nil {
+		logger("GetRecurringTransactions", err).Error(utils.StartTxErrorMsg)
+		return nil, utils.InternalServerError
+	}
+
+	userID, err := utils.GetUserIDMetadata(ctx)
+	if err != nil {
+		logger("GetRecurringTransactions", err).Error(fmt.Sprintf("GetUserIDMetadata failed"))
+		return nil, utils.InternalServerError
+	}
+
+	transactions, err := s.financialTransactionRepo.GetUserTransactions(tx, userID)
+	if err != nil {
+		logger("GetRecurringTransactions", err).Error(fmt.Sprintf("Repo call to GetUserTransactions failed"))
+		return nil, utils.InternalServerError
+	}
+
+	if len(transactions) == 0 {
+		res := &GetRecurringTransactionsResponse{
+			RecurringTransactions: nil,
+		}
+		return res, nil
+	}
+
+	var pythonTransactions []*TransactionForPython
+	for _, transaction := range transactions[0:200] {
+		pythonTransactions = append(pythonTransactions, dataToTransactionForPython(transaction))
+	}
+
+	var jsonData []byte
+	jsonData, err = json.Marshal(pythonTransactions)
+	if err != nil {
+		logger("GetRecurringTransactions", err).Error(fmt.Sprintf("Failed to marshal json request"))
+		return nil, utils.InternalServerError
+	}
+	// fmt.Println(string(jsonData))
+
+	response, err := http.Post("http://127.0.0.1:5001/recurring", "application/json", bytes.NewBuffer(jsonData))
+	if err != nil {
+		logger("GetRecurringTransactions", err).Error(fmt.Sprintf("Failed to make post call to dataprocessing server"))
+		return nil, utils.InternalServerError
+	}
+
+	responseData, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		logger("GetRecurringTransactions", err).Error(fmt.Sprintf("Failed to read response"))
+		return nil, utils.InternalServerError
+	}
+
+	var recurringTransactions []*RecurringTransaction
+	err = json.Unmarshal(responseData, &recurringTransactions)
+	if err != nil {
+		logger("GetRecurringTransactions", err).Error(fmt.Sprintf("Failed to unmarshal json response"))
+		return nil, utils.InternalServerError
+	}
+
+	err = s.txRepo.CommitTx(tx)
+	if err != nil {
+		logger("GetRecurringTransactions", err).Error(utils.CommitTxErrorMsg)
+		return nil, err
+	}
+
+	res := &GetRecurringTransactionsResponse{
+		RecurringTransactions: recurringTransactions,
+	}
+	return res, nil
+}
+
+func dataToTransactionForPython(data models.FinancialTransaction) *TransactionForPython {
+	return &TransactionForPython{
+		ID:                 data.ID,
+		CategoryID:         data.CategoryID,
+		PlaidCategoryID:    data.PlaidCategoryID,
+		PlaidTransactionID: data.PlaidTransactionID,
+		Name:               data.Name,
+		Amount:             data.Amount,
+		Date:               data.Date,
+	}
 }
