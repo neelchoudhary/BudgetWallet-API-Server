@@ -90,6 +90,30 @@ func (s *Service) Login(ctx context.Context, req *LoginRequest) (*LoginResponse,
 	return res, nil
 }
 
+// VerifyAuth ...
+func (s *Service) VerifyAuth(ctx context.Context, req *Empty) (*VerifyAuthResponse, error) {
+	userID, err := utils.GetUserIDMetadata(ctx)
+	if err != nil {
+		res := &VerifyAuthResponse{
+			Success: false,
+		}
+		return res, nil
+	}
+
+	exists, err := s.userRepo.DoesUserExist(userID)
+	if err != nil {
+		res := &VerifyAuthResponse{
+			Success: false,
+		}
+		return res, nil
+	}
+
+	res := &VerifyAuthResponse{
+		Success: exists,
+	}
+	return res, nil
+}
+
 func signUpPbToData(data User) *models.User {
 	return &models.User{
 		Email:     data.Email,

@@ -15,6 +15,15 @@ func NewUserRepository(db *sql.DB) models.UserRepository {
 	return &userRepository{db: db}
 }
 
+func (r *userRepository) DoesUserExist(userID int64) (bool, error) {
+	var exists bool
+	err := r.db.QueryRow("SELECT EXISTS(SELECT * FROM users WHERE id=$1)", userID).Scan(&exists)
+	if err != nil {
+		return false, err
+	}
+	return exists, nil
+}
+
 // GetUserByEmail tries to find user with email
 func (r *userRepository) GetUserByEmail(email string) (models.User, error) {
 	var user models.User

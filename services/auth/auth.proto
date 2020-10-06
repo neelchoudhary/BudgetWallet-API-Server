@@ -39,7 +39,14 @@ message LoginResponse {
     string token = 2;
 }
 
+message Empty {}
+
+message VerifyAuthResponse {
+    bool success = 1;
+}
+
 service AuthService {
+    rpc VerifyAuth(Empty) returns (VerifyAuthResponse) {};
     rpc Signup(SignupRequest) returns (SignupResponse) {};
     rpc Login(LoginRequest) returns (LoginResponse) {};
 }

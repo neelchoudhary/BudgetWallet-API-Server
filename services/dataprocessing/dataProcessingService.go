@@ -29,6 +29,7 @@ type Service struct {
 	txRepo                   postgresql.TxRepository
 	financialAccountRepo     models.FinancialAccountRepository
 	financialTransactionRepo models.FinancialTransactionRepository
+	recurringTransactionRepo models.RecurringTransactionRepository
 }
 
 // NewDataProcessingServer contructor to assign repo
@@ -387,19 +388,19 @@ type TransactionForPython struct {
 func (s *Service) FindRecurringTransactions(ctx context.Context, req *Empty) (*FindRecurringTransactionsResponse, error) {
 	tx, err := s.txRepo.StartTx(ctx)
 	if err != nil {
-		logger("GetRecurringTransactions", err).Error(utils.StartTxErrorMsg)
+		logger("FindRecurringTransactions", err).Error(utils.StartTxErrorMsg)
 		return nil, utils.InternalServerError
 	}
 
 	userID, err := utils.GetUserIDMetadata(ctx)
 	if err != nil {
-		logger("GetRecurringTransactions", err).Error(fmt.Sprintf("GetUserIDMetadata failed"))
+		logger("FindRecurringTransactions", err).Error(fmt.Sprintf("GetUserIDMetadata failed"))
 		return nil, utils.InternalServerError
 	}
 
 	transactions, err := s.financialTransactionRepo.GetUserTransactions(tx, userID)
 	if err != nil {
-		logger("GetRecurringTransactions", err).Error(fmt.Sprintf("Repo call to GetUserTransactions failed"))
+		logger("FindRecurringTransactions", err).Error(fmt.Sprintf("Repo call to GetUserTransactions failed"))
 		return nil, utils.InternalServerError
 	}
 
@@ -418,32 +419,45 @@ func (s *Service) FindRecurringTransactions(ctx context.Context, req *Empty) (*F
 	var jsonData []byte
 	jsonData, err = json.Marshal(pythonTransactions)
 	if err != nil {
-		logger("GetRecurringTransactions", err).Error(fmt.Sprintf("Failed to marshal json request"))
+		logger("FindRecurringTransactions", err).Error(fmt.Sprintf("Failed to marshal json request"))
 		return nil, utils.InternalServerError
 	}
 
 	response, err := http.Post("http://127.0.0.1:5001/recurring", "application/json", bytes.NewBuffer(jsonData))
 	if err != nil {
-		logger("GetRecurringTransactions", err).Error(fmt.Sprintf("Failed to make post call to dataprocessing server"))
+		logger("FindRecurringTransactions", err).Error(fmt.Sprintf("Failed to make post call to dataprocessing server"))
 		return nil, utils.InternalServerError
 	}
 
 	responseData, err := ioutil.ReadAll(response.Body)
 	if err != nil {
-		logger("GetRecurringTransactions", err).Error(fmt.Sprintf("Failed to read response"))
+		logger("FindRecurringTransactions", err).Error(fmt.Sprintf("Failed to read response"))
 		return nil, utils.InternalServerError
 	}
 
 	var recurringTransactions []*RecurringTransaction
 	err = json.Unmarshal(responseData, &recurringTransactions)
 	if err != nil {
-		logger("GetRecurringTransactions", err).Error(fmt.Sprintf("Failed to unmarshal json response"))
+		logger("FindRecurringTransactions", err).Error(fmt.Sprintf("Failed to unmarshal json response"))
 		return nil, utils.InternalServerError
+	}
+
+	err = s.recurringTransactionRepo.RemoveRecurringTransactions(tx, userID)
+	if err != nil {
+		logger("FindRecurringTransactions", err).Error(fmt.Sprintf("Repo call to RemoveRecurringTransactions failed"))
+	}
+
+	for _, recurringTransactionPb := range recurringTransactions {
+		recurringTransaction := recurringPbToData(recurringTransactionPb)
+		err := s.recurringTransactionRepo.AddRecurringTransaction(tx, recurringTransaction)
+		if err != nil {
+			logger("FindRecurringTransactions", err).Error(fmt.Sprintf("Repo call to AddRecurringTransaction failed"))
+		}
 	}
 
 	err = s.txRepo.CommitTx(tx)
 	if err != nil {
-		logger("GetRecurringTransactions", err).Error(utils.CommitTxErrorMsg)
+		logger("FindRecurringTransactions", err).Error(utils.CommitTxErrorMsg)
 		return nil, err
 	}
 
@@ -467,48 +481,9 @@ func (s *Service) GetRecurringTransactions(ctx context.Context, req *Empty) (*Ge
 		return nil, utils.InternalServerError
 	}
 
-	transactions, err := s.financialTransactionRepo.GetUserTransactions(tx, userID)
+	recurringTransactions, err := s.recurringTransactionRepo.GetRecurringTransactions(tx, userID)
 	if err != nil {
-		logger("GetRecurringTransactions", err).Error(fmt.Sprintf("Repo call to GetUserTransactions failed"))
-		return nil, utils.InternalServerError
-	}
-
-	if len(transactions) == 0 {
-		res := &GetRecurringTransactionsResponse{
-			RecurringTransactions: nil,
-		}
-		return res, nil
-	}
-
-	var pythonTransactions []*TransactionForPython
-	for _, transaction := range transactions[0:200] {
-		pythonTransactions = append(pythonTransactions, dataToTransactionForPython(transaction))
-	}
-
-	var jsonData []byte
-	jsonData, err = json.Marshal(pythonTransactions)
-	if err != nil {
-		logger("GetRecurringTransactions", err).Error(fmt.Sprintf("Failed to marshal json request"))
-		return nil, utils.InternalServerError
-	}
-	// fmt.Println(string(jsonData))
-
-	response, err := http.Post("http://127.0.0.1:5001/recurring", "application/json", bytes.NewBuffer(jsonData))
-	if err != nil {
-		logger("GetRecurringTransactions", err).Error(fmt.Sprintf("Failed to make post call to dataprocessing server"))
-		return nil, utils.InternalServerError
-	}
-
-	responseData, err := ioutil.ReadAll(response.Body)
-	if err != nil {
-		logger("GetRecurringTransactions", err).Error(fmt.Sprintf("Failed to read response"))
-		return nil, utils.InternalServerError
-	}
-
-	var recurringTransactions []*RecurringTransaction
-	err = json.Unmarshal(responseData, &recurringTransactions)
-	if err != nil {
-		logger("GetRecurringTransactions", err).Error(fmt.Sprintf("Failed to unmarshal json response"))
+		logger("GetRecurringTransactions", err).Error(fmt.Sprintf("Repo call to GetRecurringTransactions failed"))
 		return nil, utils.InternalServerError
 	}
 
@@ -518,8 +493,13 @@ func (s *Service) GetRecurringTransactions(ctx context.Context, req *Empty) (*Ge
 		return nil, err
 	}
 
+	var pbRecurringTransactions []*RecurringTransaction
+	for _, recurringTransaction := range recurringTransactions {
+		pbRecurringTransactions = append(pbRecurringTransactions, dataToRecurringPb(recurringTransaction))
+	}
+
 	res := &GetRecurringTransactionsResponse{
-		RecurringTransactions: recurringTransactions,
+		RecurringTransactions: pbRecurringTransactions,
 	}
 	return res, nil
 }
@@ -533,5 +513,29 @@ func dataToTransactionForPython(data models.FinancialTransaction) *TransactionFo
 		Name:               data.Name,
 		Amount:             data.Amount,
 		Date:               data.Date,
+	}
+}
+
+func dataToRecurringPb(data models.RecurringTransaction) *RecurringTransaction {
+	return &RecurringTransaction{
+		Id:              data.ID,
+		TransactionName: data.Name,
+		CategoryId:      data.CategoryID,
+		SimilarCount:    data.RecurringCount,
+		IsRecurring:     data.IsRecurring,
+		RecurringScore:  1000, // TODO change to float in db
+		SimilarPlaidIds: data.RecurringPlaidIDs,
+	}
+}
+
+func recurringPbToData(data *RecurringTransaction) *models.RecurringTransaction {
+	return &models.RecurringTransaction{
+		ID:                data.Id,
+		Name:              data.TransactionName,
+		CategoryID:        data.CategoryId,
+		RecurringCount:    data.SimilarCount,
+		IsRecurring:       data.IsRecurring,
+		RecurringScore:    1000, // TODO change to float in db
+		RecurringPlaidIDs: data.SimilarPlaidIds,
 	}
 }

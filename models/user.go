@@ -41,6 +41,7 @@ func (u *User) Login(password string, jwtManager *utils.JWTManager) (string, err
 
 // UserRepository ...
 type UserRepository interface {
+	DoesUserExist(userID int64) (bool, error)
 	GetUserByEmail(email string) (User, error)
 	CreateUser(user User) error
 }
