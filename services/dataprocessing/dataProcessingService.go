@@ -448,7 +448,11 @@ func (s *Service) FindRecurringTransactions(ctx context.Context, req *Empty) (*F
 		logger("FindRecurringTransactions", err).Error(fmt.Sprintf("Repo call to RemoveRecurringTransactions failed"))
 	}
 
+	fmt.Println("beepboop")
+
 	for _, recurringTransactionPb := range recurringTransactions {
+		fmt.Println("does ths happen")
+		fmt.Println(recurringTransactionPb)
 		recurringTransaction := recurringPbToData(recurringTransactionPb, userID)
 		err := s.recurringTransactionRepo.AddRecurringTransaction(tx, recurringTransaction)
 		if err != nil {
