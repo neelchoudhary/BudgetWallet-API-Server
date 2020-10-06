@@ -57,13 +57,14 @@ func main() {
 	accountRepo := postgresql.NewFinancialAccountRepository(db)
 	transactionRepo := postgresql.NewFinancialTransactionRepository(db)
 	categoryRepo := postgresql.NewFinancialCategoryRepository(db)
+	recurringTransactionRepo := postgresql.NewRecurringTransactionRepository(db)
 
 	// Create Services
 	authService := auth.NewAuthServiceServer(&authRepo, jwtManager)
 	userFinancesService := userfinances.NewUserFinancesServer(&txRepo, &itemRepo, &accountRepo, &transactionRepo)
 	plaidFinancesService := plaidfinances.NewPlaidFinancesServer(&txRepo, &itemRepo, &accountRepo, &transactionRepo, &categoryRepo, plaidClient)
 	financialCategoriesService := financialcategories.NewFinancialCategoriesServer(&txRepo, &categoryRepo, plaidClient)
-	dataProcessingService := dataprocessing.NewDataProcessingServer(&txRepo, &accountRepo, &transactionRepo)
+	dataProcessingService := dataprocessing.NewDataProcessingServer(&txRepo, &accountRepo, &transactionRepo, &recurringTransactionRepo)
 	webhooksService := webhooks.NewWebhooksServer(&txRepo, &itemRepo, plaidClient)
 
 	// Create Server

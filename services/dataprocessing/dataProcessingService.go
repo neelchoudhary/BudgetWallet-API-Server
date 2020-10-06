@@ -33,8 +33,8 @@ type Service struct {
 }
 
 // NewDataProcessingServer contructor to assign repo
-func NewDataProcessingServer(txRepo *postgresql.TxRepository, accountRepo *models.FinancialAccountRepository, transactionRepo *models.FinancialTransactionRepository) DataProcessingServiceServer {
-	return &Service{txRepo: *txRepo, financialAccountRepo: *accountRepo, financialTransactionRepo: *transactionRepo}
+func NewDataProcessingServer(txRepo *postgresql.TxRepository, accountRepo *models.FinancialAccountRepository, transactionRepo *models.FinancialTransactionRepository, recurringTransactionRepo *models.RecurringTransactionRepository) DataProcessingServiceServer {
+	return &Service{txRepo: *txRepo, financialAccountRepo: *accountRepo, financialTransactionRepo: *transactionRepo, recurringTransactionRepo: *recurringTransactionRepo}
 }
 
 // GetAccountDailySnapshots get daily snapshots for an account
