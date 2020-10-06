@@ -3,7 +3,6 @@ package auth
 import (
 	"context"
 	"fmt"
-	"strconv"
 	"time"
 
 	log "github.com/sirupsen/logrus"
@@ -95,7 +94,6 @@ func (s *Service) Login(ctx context.Context, req *LoginRequest) (*LoginResponse,
 func (s *Service) VerifyAuth(ctx context.Context, req *Empty) (*VerifyAuthResponse, error) {
 	userID, err := utils.GetUserIDMetadata(ctx)
 	if err != nil {
-		fmt.Println("METADATTA ERROR")
 		res := &VerifyAuthResponse{
 			Success: false,
 		}
@@ -104,13 +102,11 @@ func (s *Service) VerifyAuth(ctx context.Context, req *Empty) (*VerifyAuthRespon
 
 	exists, err := s.userRepo.DoesUserExist(userID)
 	if err != nil {
-		fmt.Println("REPO RERREOR")
 		res := &VerifyAuthResponse{
 			Success: false,
 		}
 		return res, nil
 	}
-	fmt.Println("EXists: " + strconv.FormatBool(exists))
 	res := &VerifyAuthResponse{
 		Success: exists,
 	}

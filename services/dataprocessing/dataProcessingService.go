@@ -423,7 +423,8 @@ func (s *Service) FindRecurringTransactions(ctx context.Context, req *Empty) (*F
 		return nil, utils.InternalServerError
 	}
 
-	response, err := http.Post("http://127.0.0.1:5001/recurring", "application/json", bytes.NewBuffer(jsonData))
+	// response, err := http.Post("http://127.0.0.1:5001/recurring", "application/json", bytes.NewBuffer(jsonData))
+	response, err := http.Post("https://361f53a3dbb4.ngrok.io/recurring", "application/json", bytes.NewBuffer(jsonData))
 	if err != nil {
 		logger("FindRecurringTransactions", err).Error(fmt.Sprintf("Failed to make post call to dataprocessing server"))
 		return nil, utils.InternalServerError
