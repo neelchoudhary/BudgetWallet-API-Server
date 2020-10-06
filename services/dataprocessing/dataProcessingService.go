@@ -449,7 +449,7 @@ func (s *Service) FindRecurringTransactions(ctx context.Context, req *Empty) (*F
 	}
 
 	for _, recurringTransactionPb := range recurringTransactions {
-		recurringTransaction := recurringPbToData(recurringTransactionPb)
+		recurringTransaction := recurringPbToData(recurringTransactionPb, userID)
 		err := s.recurringTransactionRepo.AddRecurringTransaction(tx, recurringTransaction)
 		if err != nil {
 			logger("FindRecurringTransactions", err).Error(fmt.Sprintf("Repo call to AddRecurringTransaction failed"))
@@ -525,18 +525,25 @@ func dataToRecurringPb(data models.RecurringTransaction) *RecurringTransaction {
 		SimilarCount:    data.RecurringCount,
 		IsRecurring:     data.IsRecurring,
 		RecurringScore:  1000, // TODO change to float in db
-		SimilarPlaidIds: data.RecurringPlaidIDs,
+		SimilarPlaidIds: nil,  // data.RecurringPlaidIDs,
 	}
 }
 
-func recurringPbToData(data *RecurringTransaction) *models.RecurringTransaction {
+func recurringPbToData(data *RecurringTransaction, userID int64) *models.RecurringTransaction {
+	recurringPlaidIds := "{"
+	for _, similarPlaidID := range data.SimilarPlaidIds {
+		recurringPlaidIds += "'" + similarPlaidID + "', "
+	}
+	recurringPlaidIds = strings.TrimRight(recurringPlaidIds, ", ")
+	recurringPlaidIds += "}"
 	return &models.RecurringTransaction{
 		ID:                data.Id,
+		UserID:            userID,
 		Name:              data.TransactionName,
 		CategoryID:        data.CategoryId,
 		RecurringCount:    data.SimilarCount,
 		IsRecurring:       data.IsRecurring,
 		RecurringScore:    1000, // TODO change to float in db
-		RecurringPlaidIDs: data.SimilarPlaidIds,
+		RecurringPlaidIDs: recurringPlaidIds,
 	}
 }

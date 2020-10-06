@@ -41,9 +41,9 @@ func (r *recurringTransactionRepository) GetRecurringTransactions(tx *sql.Tx, us
 	for rows.Next() {
 		recurringTransaction := models.RecurringTransaction{}
 		err := rows.Scan(
-			&recurringTransaction.ID, recurringTransaction.UserID, recurringTransaction.Name,
-			recurringTransaction.CategoryID, recurringTransaction.RecurringCount, recurringTransaction.RecurringScore,
-			recurringTransaction.IsRecurring, recurringTransaction.RecurringPlaidIDs)
+			&recurringTransaction.ID, &recurringTransaction.UserID, &recurringTransaction.Name,
+			&recurringTransaction.CategoryID, &recurringTransaction.RecurringCount, &recurringTransaction.RecurringScore,
+			&recurringTransaction.IsRecurring, &recurringTransaction.RecurringPlaidIDs)
 		if err != nil {
 			return nil, err
 		}
